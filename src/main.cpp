@@ -56,7 +56,7 @@ void loop() {
   if (fw.done()) {
     fw.clear();
     FastLED.show();    
-    delay(5000);
+    delay(3000);
     selectFW = !selectFW;
     testFW(selectFW);
   }
