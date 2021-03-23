@@ -6,9 +6,10 @@
 
 class Train {
   public:
-    Train(CRGB* leds, CRGB trainColor, CRGB trackColor);
+    void init(CRGB* leds, CRGB trainColor, CRGB trackColor);
     void advance(short toPosition);
-
+    bool isEmpty();
+    
   private:
     CRGB* m_leds;
     CRGB  m_trackColor;

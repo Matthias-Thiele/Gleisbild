@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include "./FastLed/FastLED.h"
-#include "AsyncTmer.hpp"
-#include "FahrwegIterator.hpp"
+#include "Fahrweg.hpp"
 
 void trackHandler(AsyncTimer *timer, unsigned long now);
 
@@ -12,69 +11,39 @@ void trackHandler(AsyncTimer *timer, unsigned long now);
 #define COLOR_ORDER GRB
 
 void showTrack();
-void setTrain(int pos);
 void setSignal();
 
 CRGB leds[NUM_LEDS];
+bool ledsChanged = false;
+
 unsigned long start;
 int pos;
 int loopCount = 1;
+bool selectFW = false;
+CRGB trainColor = {0, 0, 0xff};
+CRGB trackColor = {0x40, 0x40, 0x40};
+Fahrweg fw(leds, trainColor, trackColor);
+short list1[] = {0, 74, -1};
+short list2[] = {75, 89, 60, 0, -1};
 
+void testFW(bool inOut) {
 
-void testFW() {
-  FahrwegIterator fwi;
-  int list1[] = {0, 3, 10, 13, 23, 20, 30, 30, -1};
-  fwi.setFahrwegList(list1);
+  fw.set((inOut) ? list1 : list2, NULL);
 
   Serial.println("Fahrweg Test");
-  while (fwi.hasMore()) {
-    int pos = fwi.nextPos();
-    Serial.print(pos);
-    Serial.print(" - ");
-  }
+  fw.start();
 
   Serial.println("done.");
 }
 
 void setup() {
   Serial.begin(115200);
-  testFW();
-
-  Serial.println("Gleisbild started.");
-  // put your setup code here, to run once:
-  AsyncTimer::add(500, -1, 12345, trackHandler);
-  start = millis();
-  pos = -10;
 
   delay( 1000 ); // power-up safety delay
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness(  BRIGHTNESS );
-
-  showTrack();
-  setSignal();
-  setTrain(1);
-
-  FastLED.show();
 }
 
-void showTrack() {
-  for (int i = 0; i < 75; i++) {
-    leds[i].b = 0x80;
-    leds[i].r = 0x80;
-    leds[i].g = 0x80;
-  }
-}
-
-void setTrain(int pos) {
-  if (pos < 0) {
-    pos = 0;
-  }
-
-  for (int i = 0; i < 5; i++) {
-    if (i + pos > 74) break;
-    leds[i + pos] = CRGB::Blue;
-  }
-}
 
 void setSignal() {
   if (pos > 10 || pos < 0) {
@@ -86,33 +55,20 @@ void setSignal() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  if (fw.done()) {
+    Serial.println("now clear");
+    fw.clear();
+    FastLED.show();    
+    delay(5000);
+    selectFW = !selectFW;
+    Serial.println("start new");
+    testFW(selectFW);
+  }
+
   AsyncTimer::tick();
-}
-
-void trackHandler(AsyncTimer *timer, unsigned long now) {
-    Serial.print("Show Track ");
-    Serial.print(timer->getActivated());
-    Serial.print(" ");
-    Serial.print(timer->getParam());
-    Serial.print(" ");
-    Serial.println(timer->isOdd());
-
-    unsigned long start = millis();
-    showTrack();
-    setSignal();
-    setTrain(pos++);
+  if (ledsChanged) {
+    Serial.println("Update LEDs");
     FastLED.show();
-    timer->setParam(millis() - start);
-
-    if (pos > 75) {
-      pos = -10;
-      start += 1000;
-
-      loopCount++;
-      if (loopCount > 3) {
-        loopCount = 0;
-      }
-      FastLED.setBrightness(  BRIGHTNESS * loopCount - 1 );
-    }
+    ledsChanged = false;
+  }
 }
-

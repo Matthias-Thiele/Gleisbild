@@ -5,12 +5,12 @@
 
 class FahrwegIterator {
   public:
-    void setFahrwegList(int* positionList);
+    void setFahrwegList(short* positionList);
     int nextPos();
     bool hasMore();
 
   private:
-    int *m_Items;
+    short *m_Items;
     int m_Start;
     int m_End;
     int m_Direction;

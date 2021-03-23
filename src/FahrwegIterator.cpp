@@ -1,6 +1,6 @@
 #include "FahrwegIterator.hpp"
 
-void FahrwegIterator::setFahrwegList(int* positionList) {
+void FahrwegIterator::setFahrwegList(short* positionList) {
   m_Items = positionList;
   nextItem();
 }
@@ -23,6 +23,11 @@ int FahrwegIterator::nextPos() {
 }
 
 void FahrwegIterator::nextItem() {
+  if (!m_Items) {
+    m_Start = END_OF_FW;
+    return;
+  }
+
   m_Start = *m_Items++;
   if (m_Start != END_OF_FW) {
     m_End = *m_Items++;
