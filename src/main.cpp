@@ -32,8 +32,6 @@ void testFW(bool inOut) {
 
   Serial.println("Fahrweg Test");
   fw.start();
-
-  Serial.println("done.");
 }
 
 void setup() {
@@ -56,18 +54,15 @@ void setSignal() {
 void loop() {
   // put your main code here, to run repeatedly:
   if (fw.done()) {
-    Serial.println("now clear");
     fw.clear();
     FastLED.show();    
     delay(5000);
     selectFW = !selectFW;
-    Serial.println("start new");
     testFW(selectFW);
   }
 
   AsyncTimer::tick();
   if (ledsChanged) {
-    Serial.println("Update LEDs");
     FastLED.show();
     ledsChanged = false;
   }
