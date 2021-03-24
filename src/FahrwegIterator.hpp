@@ -7,6 +7,7 @@ class FahrwegIterator {
   public:
     void setFahrwegList(short* positionList);
     int nextPos();
+    int peekPos();
     bool hasMore();
 
   private:

@@ -1,5 +1,7 @@
 #include "Fahrweg.hpp"
 extern bool ledsChanged;
+extern int signalState;
+extern void setSignal(int go);
 
 static void trainHandler(AsyncTimer *timer, unsigned long now, void* source) {
   Fahrweg* fw = (Fahrweg*)source;
@@ -56,7 +58,19 @@ void Fahrweg::start() {
 
 void Fahrweg::advance() {
   if (m_fwi.hasMore() || !m_train.isEmpty()) {
-    short pos = m_fwi.nextPos();
+    short pos = m_fwi.peekPos();
+    Serial.print("now at pos "); Serial.println(pos);
+    if (pos == 82 && signalState == 2) {
+      Serial.println("Wait for Signal");
+      return;
+    }
+
+    if (pos == 89 && signalState != 0) {
+      Serial.println("Halt Signal");
+      setSignal(3);
+    }
+
+    m_fwi.nextPos();
     m_train.advance(pos);
     ledsChanged = true;
   } else {

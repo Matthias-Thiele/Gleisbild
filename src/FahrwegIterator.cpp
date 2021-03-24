@@ -9,6 +9,10 @@ bool FahrwegIterator::hasMore() {
   return m_ActPos != END_OF_FW;
 }
 
+int FahrwegIterator::peekPos() {
+  return m_ActPos;
+}
+
 int FahrwegIterator::nextPos() {
   int result = m_ActPos;
   if (result != END_OF_FW) {
