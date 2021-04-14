@@ -8,7 +8,7 @@
 class Fahrweg {
   public:
     Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor);
-    void set(short* fahrwegItems, unsigned int* eventList);
+    void set(short* fahrwegItems, unsigned long* eventList);
     void start();
     void advance();
     bool done();
@@ -16,7 +16,7 @@ class Fahrweg {
 
   private:
     short* m_fahrwegItems;
-    unsigned int* m_eventList;
+    unsigned long* m_eventList;
     CRGB* m_leds;
     CRGB  m_trackColor;
     Train m_train;

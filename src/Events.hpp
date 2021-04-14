@@ -1,0 +1,4 @@
+
+#define SET_SIGNAL 0x100000ul
+#define RESET_SIGNAL 0x200000ul
+#define WAIT_FOR_SIGNAL 0x400000ul

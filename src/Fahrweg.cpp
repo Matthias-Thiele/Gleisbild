@@ -1,7 +1,9 @@
 #include "Fahrweg.hpp"
+#include "Signal.hpp"
+#include "Events.hpp"
+
 extern bool ledsChanged;
-extern int signalState;
-extern void setSignal(int go);
+extern Signal signale[9];
 
 static void trainHandler(AsyncTimer *timer, unsigned long now, void* source) {
   Fahrweg* fw = (Fahrweg*)source;
@@ -38,7 +40,9 @@ void Fahrweg::clear() {
   ledsChanged = true;
 }
 
-void Fahrweg::set(short* fahrwegItems, unsigned int* eventList) {
+void Fahrweg::set(short* fahrwegItems, unsigned long* eventList) {
+  unsigned long* p = eventList;
+  
   m_fahrwegItems = fahrwegItems;
   m_eventList = eventList;
   m_fwi.setFahrwegList(fahrwegItems);
@@ -53,21 +57,37 @@ void Fahrweg::set(short* fahrwegItems, unsigned int* eventList) {
 }
 
 void Fahrweg::start() {
-  m_timer = AsyncTimer::add(500, -1, this, trainHandler);
+  m_timer = AsyncTimer::add(50, -1, this, trainHandler);
 }
 
 void Fahrweg::advance() {
   if (m_fwi.hasMore() || !m_train.isEmpty()) {
     short pos = m_fwi.peekPos();
-    Serial.print("now at pos "); Serial.println(pos);
-    if (pos == 82 && signalState == 2) {
-      Serial.println("Wait for Signal");
-      return;
-    }
+    //Serial.print("now at pos "); Serial.println(pos);
 
-    if (pos == 89 && signalState != 0) {
-      Serial.println("Halt Signal");
-      setSignal(3);
+    unsigned long* evp = m_eventList;
+    while (unsigned long ev = *evp++) {
+      if (((short)(ev & 0xffful)) == pos) {
+        int sig = (ev >> 12) & 0xff;
+        switch (ev & 0xf00000) {
+          case SET_SIGNAL:
+            signale[sig].set();
+            Serial.print(" Set signal "); Serial.println(sig);
+            break;
+        
+          case RESET_SIGNAL:
+            signale[sig].release();
+            Serial.print(" Reset signal "); Serial.println(sig);
+            break;
+        
+          case WAIT_FOR_SIGNAL:
+            if (!signale[sig].isSet()) {
+              Serial.print(" Wait for signal "); Serial.println(sig);
+              return;
+            }
+            break;
+        }
+      }
     }
 
     m_fwi.nextPos();
