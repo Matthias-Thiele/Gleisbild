@@ -22,6 +22,7 @@ bool Signal::isSet() {
 }
 
 void Signal::set() {
+  Serial.print("Set to green "); Serial.println(m_ledPos);
   m_set = true;
   m_leds[m_ledPos] = CRGB::Green;
   ledsChanged = true;

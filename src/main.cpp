@@ -1,17 +1,19 @@
 #include <Arduino.h>
 #include "./FastLed/FastLED.h"
+#include "World.hpp"
 #include "Fahrweg.hpp"
 #include "Signal.hpp"
 #include "Events.hpp"
 
-void trackHandler(AsyncTimer *timer, unsigned long now);
 
 #define LED_PIN     5
 #define FWBLOCK_PIN 4
-#define NUM_LEDS    300
+#define NUM_LEDS    580
 #define BRIGHTNESS  64
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
+
+World *world;
 
 void showTrack();
 void setSignal(int go);
@@ -76,7 +78,7 @@ unsigned long evLiebCalw[] = {
   0
 };
 
-Signal signale[9];
+Signal signale[16];
 bool lastFWState = false;
 
 void testFW(bool inOut) {
@@ -148,34 +150,103 @@ void testFW2(bool inOut, bool althlbz) {
   fw.start();
 }
 
+int actPin = -1;
+unsigned long actMillis = millis();
+int actSignal = 0;
+
+void trackHandler(AsyncTimer *timer, unsigned long now, void* param);
+
+void signalHandler(AsyncTimer* timer, unsigned long now, void* param) {
+  Serial.println("signal Handler activated.");
+
+  for (int i = 0; i < 16; i++) {
+    if (i == actSignal) {
+      signale[i].set();
+    } else {
+      signale[i].release();
+    }
+  }
+
+  FastLED.show();
+
+  actSignal++;
+  if (actSignal > 15) {
+    actSignal = 0;
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   pinMode(FWBLOCK_PIN, INPUT);
 
   delay( 1000 ); // power-up safety delay
+  world = new World();
+  return;
+
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness(  BRIGHTNESS );
 
-  Signal::setLeds(leds);
-  signale[0].setLedNo(0);
-  signale[1].setLedNo(91);
-  signale[2].setLedNo(92);
-  signale[3].setLedNo(0);
-  signale[4].setLedNo(92);
-  signale[5].setLedNo(91);
-  signale[6].setLedNo(185);
-  signale[7].setLedNo(94);
-  signale[8].setLedNo(93);
 
-  for (int i = 0; i < 6; i++) {
+  Signal::setLeds(leds);
+  signale[0].setLedNo(468);
+  signale[1].setLedNo(559);
+  signale[2].setLedNo(560);
+  signale[3].setLedNo(205);
+  signale[4].setLedNo(296);
+  signale[5].setLedNo(297);
+  signale[6].setLedNo(390);
+  signale[7].setLedNo(298);
+  signale[8].setLedNo(299);
+  signale[9].setLedNo(0);
+  signale[10].setLedNo(1);
+  signale[11].setLedNo(2);
+  signale[12].setLedNo(34);
+  signale[13].setLedNo(35);
+  signale[14].setLedNo(36);
+  signale[15].setLedNo(37);
+
+  for (int i = 0; i < 16; i++) {
     signale[i].release();
   }
- 
-  
+
+  AsyncTimer::add(1000, -1, 0, signalHandler);
 }
 
 
 void loop() {
+  unsigned long now = millis();
+  world->test(now);
+  if (ledsChanged) {
+    FastLED.show();
+    ledsChanged = false;
+  }
+  return;
+
+  if (now > actMillis) {
+    if (digitalRead(FWBLOCK_PIN) == 0) {
+      actMillis += 100;
+      return;
+    }
+
+    if (actPin >= 0) {
+      leds[actPin] = 0;
+    }
+
+    actPin++;
+    Serial.println(actPin);
+    leds[actPin] = trainColor;
+    actMillis += 100;
+    FastLED.show();
+
+    if (actPin >= NUM_LEDS) {
+      actPin = -1;
+    }
+  }
+
+  AsyncTimer::tick();
+
+  return;
+
   // put your main code here, to run repeatedly:
   if (!selectFW && !lastFWState && digitalRead(FWBLOCK_PIN) == 1) {
     Serial.println("Ausfahrt aus AHLB erlaubt, set LastFW.");

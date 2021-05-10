@@ -4,11 +4,14 @@
 #include "Train.hpp"
 #include "FahrwegIterator.hpp"
 #include "AsyncTimer.hpp"
+#include "Signal.hpp"
 
 class Fahrweg {
   public:
+    static void setSignals(Signal* signals);
     Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor);
     void set(short* fahrwegItems, unsigned long* eventList);
+    void show();
     void start();
     void advance();
     bool done();
@@ -21,6 +24,7 @@ class Fahrweg {
     CRGB  m_trackColor;
     Train m_train;
     FahrwegIterator m_fwi;
+    bool m_shown;
     AsyncTimer* m_timer;
 };
 

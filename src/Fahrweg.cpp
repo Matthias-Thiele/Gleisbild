@@ -3,13 +3,16 @@
 #include "Events.hpp"
 
 extern bool ledsChanged;
-extern Signal signale[9];
+Signal* g_signals;
 
 static void trainHandler(AsyncTimer *timer, unsigned long now, void* source) {
   Fahrweg* fw = (Fahrweg*)source;
   fw->advance();
 }
 
+void Fahrweg::setSignals(Signal* signals) {
+  g_signals = signals;
+}
 
 Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor) {
   m_train.init(leds, trainColor, trackColor);
@@ -17,6 +20,7 @@ Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor) {
   m_trackColor = trackColor;
   m_timer = NULL;
   m_fahrwegItems = NULL;
+  m_shown = false;
 }
 
 void Fahrweg::clear() {
@@ -29,7 +33,7 @@ void Fahrweg::clear() {
 
   while (m_fwi.hasMore()) {
     int pos = m_fwi.nextPos();
-    if (pos < 0 || pos > 300) {
+    if (pos < 0 || pos > 600) {
       Serial.println("+++++ Error +++++++++");
       delay(1000);
     } else {
@@ -40,20 +44,25 @@ void Fahrweg::clear() {
   ledsChanged = true;
 }
 
-void Fahrweg::set(short* fahrwegItems, unsigned long* eventList) {
-  unsigned long* p = eventList;
-  
-  m_fahrwegItems = fahrwegItems;
-  m_eventList = eventList;
-  m_fwi.setFahrwegList(fahrwegItems);
+void Fahrweg::show() {
+  m_fwi.setFahrwegList(m_fahrwegItems);
 
   while (m_fwi.hasMore()) {
     int pos = m_fwi.nextPos();
     m_leds[pos] = m_trackColor;
   }
 
-  m_fwi.setFahrwegList(fahrwegItems);
   ledsChanged = true;
+  m_shown = true;
+
+  m_fwi.setFahrwegList(m_fahrwegItems);
+}
+
+void Fahrweg::set(short* fahrwegItems, unsigned long* eventList) {
+  m_fahrwegItems = fahrwegItems;
+  m_eventList = eventList;
+
+  m_fwi.setFahrwegList(fahrwegItems);
 }
 
 void Fahrweg::start() {
@@ -61,7 +70,8 @@ void Fahrweg::start() {
 }
 
 void Fahrweg::advance() {
-  if (m_fwi.hasMore() || !m_train.isEmpty()) {
+  //if (m_fwi.hasMore() || !m_train.isEmpty()) {
+  if (m_fwi.hasMore()) {
     short pos = m_fwi.peekPos();
     //Serial.print("now at pos "); Serial.println(pos);
 
@@ -69,19 +79,22 @@ void Fahrweg::advance() {
     while (unsigned long ev = *evp++) {
       if (((short)(ev & 0xffful)) == pos) {
         int sig = (ev >> 12) & 0xff;
+      Serial.print("now at pos "); Serial.print(pos);
+      Serial.print(", Signal "); Serial.println(sig);
+      Serial.print(", Event "); Serial.println(ev >> 20);
         switch (ev & 0xf00000) {
           case SET_SIGNAL:
-            signale[sig].set();
+            g_signals[sig].set();
             Serial.print(" Set signal "); Serial.println(sig);
             break;
         
           case RESET_SIGNAL:
-            signale[sig].release();
+            g_signals[sig].release();
             Serial.print(" Reset signal "); Serial.println(sig);
             break;
         
           case WAIT_FOR_SIGNAL:
-            if (!signale[sig].isSet()) {
+            if (!g_signals[sig].isSet()) {
               Serial.print(" Wait for signal "); Serial.println(sig);
               return;
             }
@@ -96,10 +109,11 @@ void Fahrweg::advance() {
   } else {
     AsyncTimer::kill(m_timer);
     m_timer = NULL;
+    m_shown = false;
   }
 }
 
 bool Fahrweg::done() {
-  //Serial.print("FW done? "); Serial.println((long)m_timer);
-  return m_timer == NULL;
+  //Serial.print("FW done? "); Serial.println(m_shown);
+  return !m_shown; // m_timer == NULL;
 }
