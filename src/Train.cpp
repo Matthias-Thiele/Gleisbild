@@ -26,6 +26,15 @@ void Train::advance(short toPosition) {
   }
 }
 
+void Train::redraw() {
+  for (int i = 0; i < TRAIN_LENGTH; i++) {
+    int toPosition = m_positions[i];
+    if (toPosition != -1) {
+      m_leds[toPosition] = m_trainColor;
+    }
+  }
+}
+
 bool Train::isEmpty() {
   for (int i = 0; i < TRAIN_LENGTH; i++) {
     if (m_positions[i] != -1) {

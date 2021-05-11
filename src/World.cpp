@@ -6,6 +6,9 @@
 #define COLOR_ORDER GRB
 
 unsigned long dummyEventList[] = {0};
+int testList[] = {FW_AH_T3, FW_WB_T2, FW_LB_T4, FW_T3_LB, FW_T2_AH, FW_LB_T1, FW_T1_WB, FW_LB_T3, FW_T4_AH, FW_WB_T4,
+                  FW_T4_LB, FW_T3_AH, FW_WB_T1, FW_LB_T2, FW_AH_T4, FW_T1_LB, FW_T2_WB, FW_T4_WB, FW_AH_T2, FW_T2_LB, 
+                  -1};
 
 // Einfahrt von Bad Liebenzell
 short lbefs[] = {315, 385, -1};
@@ -82,7 +85,7 @@ short wbt2[] = {544, 558, 529, 469, 130, 125, 122, 78, -1};
 short wbt4[] = {544, 558, 529, 469, 130, 125, 122, 119, 467, 425, -1};
 
 // Ausfahrt nach Wildberg
-short cwbt1[] = {168, 130, 469, 543, -1};
+short cwbt1[] = {169, 130, 469, 543, -1};
 unsigned long cwbt1ev[] = {
   SET_SIGNAL | (9ul << 12) | 166ul,
   RESET_SIGNAL | (9ul << 12) | 135ul,
@@ -221,73 +224,73 @@ void World::initFahrstrassen() {
   }
 
   // Liebenzell bis zum Einfahrtsignal
-  fahrwege[FW_LB_EFS]->set(lbefs, lbefsev);
+  fahrwege[FW_LB_EFS]->set(lbefs, lbefsev, true);
 
   // Liebenzell auf Gleis 1
-  fahrwege[FW_LB_T1]->set(lbt1, lbt1234ev);
+  fahrwege[FW_LB_T1]->set(lbt1, lbt1234ev, true);
 
   // Liebenzell auf Gleis 2
-  fahrwege[FW_LB_T2]->set(lbt2, lbt1234ev);
+  fahrwege[FW_LB_T2]->set(lbt2, lbt1234ev, true);
 
   // Liebenzell auf Gleis 3
-  fahrwege[FW_LB_T3]->set(lbt3, lbt1234ev);
+  fahrwege[FW_LB_T3]->set(lbt3, lbt1234ev, true);
 
   // Liebenzell auf Gleis 4
-  fahrwege[FW_LB_T4]->set(lbt4, lbt1234ev);
+  fahrwege[FW_LB_T4]->set(lbt4, lbt1234ev, true);
 
   // Althengstett bis zum Einfahrtsignal
-  fahrwege[FW_AH_EFS]->set(ahefs, ahefsev);
+  fahrwege[FW_AH_EFS]->set(ahefs, ahefsev, true);
 
   // Althengstett auf Gleis 2
-  fahrwege[FW_AH_T2]->set(aht2, aht234ev);
+  fahrwege[FW_AH_T2]->set(aht2, aht234ev, true);
 
   // Althengstett auf Gleis 3
-  fahrwege[FW_AH_T3]->set(aht3, aht234ev);
+  fahrwege[FW_AH_T3]->set(aht3, aht234ev, true);
 
   // Althengstett auf Gleis 4
-  fahrwege[FW_AH_T4]->set(aht4, aht234ev);
+  fahrwege[FW_AH_T4]->set(aht4, aht234ev, true);
 
   // Wildberg bis zum Einfahrtsignal
-  fahrwege[FW_WB_EFS]->set(wbefs, wbefsev);
+  fahrwege[FW_WB_EFS]->set(wbefs, wbefsev, true);
 
   // Wildberg auf Gleis 1
-  fahrwege[FW_WB_T1]->set(wbt1, wbt124ev);
+  fahrwege[FW_WB_T1]->set(wbt1, wbt124ev, true);
 
   // Wildberg auf Gleis 2
-  fahrwege[FW_WB_T2]->set(wbt2, wbt124ev);
+  fahrwege[FW_WB_T2]->set(wbt2, wbt124ev, true);
 
   // Wildberg auf Gleis 4
-  fahrwege[FW_WB_T4]->set(wbt4, wbt124ev);
+  fahrwege[FW_WB_T4]->set(wbt4, wbt124ev, true);
 
   // Nach Wildberg von Gleis 1
-  fahrwege[FW_T1_WB]->set(cwbt1, cwbt1ev);
+  fahrwege[FW_T1_WB]->set(cwbt1, cwbt1ev, false);
 
   // Nach Wildberg von Gleis 2
-  fahrwege[FW_T2_WB]->set(cwbt2, cwbt2ev);
+  fahrwege[FW_T2_WB]->set(cwbt2, cwbt2ev, false);
 
   // Nach Wildberg von Gleis 4
-  fahrwege[FW_T4_WB]->set(cwbt4, cwbt4ev);
+  fahrwege[FW_T4_WB]->set(cwbt4, cwbt4ev, false);
 
   // Nach Liebenzell von Gleis 1
-  fahrwege[FW_T1_LB]->set(clbt1, clbt1ev);
+  fahrwege[FW_T1_LB]->set(clbt1, clbt1ev, false);
 
   // Nach Liebenzell von Gleis 2
-  fahrwege[FW_T2_LB]->set(clbt2, clbt2ev);
+  fahrwege[FW_T2_LB]->set(clbt2, clbt2ev, false);
 
   // Nach Liebenzell von Gleis 3
-  fahrwege[FW_T3_LB]->set(clbt3, clbt3ev);
+  fahrwege[FW_T3_LB]->set(clbt3, clbt3ev, false);
 
   // Nach Liebenzell von Gleis 4
-  fahrwege[FW_T4_LB]->set(clbt4, clbt4ev);
+  fahrwege[FW_T4_LB]->set(clbt4, clbt4ev, false);
 
   // Nach Althengstett von Gleis 2
-  fahrwege[FW_T2_AH]->set(caht2, caht2ev);
+  fahrwege[FW_T2_AH]->set(caht2, caht2ev, false);
 
   // Nach Althengstett von Gleis 3
-  fahrwege[FW_T3_AH]->set(caht3, caht3ev);
+  fahrwege[FW_T3_AH]->set(caht3, caht3ev, false);
 
   // Nach Althengstett von Gleis 4
-  fahrwege[FW_T4_AH]->set(caht4, caht4ev);
+  fahrwege[FW_T4_AH]->set(caht4, caht4ev, false);
 
  }
 
@@ -301,27 +304,26 @@ void World::test(unsigned long now) {
   }
 
   if (activeFW >= 0) {
-    if (fahrwege[activeFW]->done()) {
+    if (fahrwege[testList[activeFW]]->done()) {
       Serial.println("Fahrstrasse done.");
-      delay(500);
-      fahrwege[activeFW]->clear();
+      delay(1000);
+      //fahrwege[testList[activeFW]]->clear();
       activeFW++;
-      if (activeFW > 14) {
-        activeFW = 8;
-      } else {
-        activeFW = 22;
+      if (testList[activeFW] < 0) {
+        activeFW = 0;
       }
-      Serial.print("Show Fahrstrasse "); Serial.println(activeFW);
-      fahrwege[activeFW]->show();
+      Serial.print("Show Fahrstrasse "); Serial.println(testList[activeFW]);
+      fahrwege[testList[activeFW]]->show();
+      Serial.println("Show done.");
     }
   }
 
   if (activeFW < 0) {
-    activeFW = 22;
-    fahrwege[activeFW]->show();
+    activeFW = 0;
+    fahrwege[testList[activeFW]]->show();
   }
 
   //Serial.println("Advance");
-  fahrwege[activeFW]->advance();
+  fahrwege[testList[activeFW]]->advance();
   lastStep = now + 50;
 }

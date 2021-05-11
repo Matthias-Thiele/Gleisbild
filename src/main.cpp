@@ -85,10 +85,10 @@ void testFW(bool inOut) {
 
   if (inOut) {
     Serial.println("Nach Wildberg");
-    fw.set(list1, events1);
+    fw.set(list1, events1, false);
   } else {
     Serial.println("Von Wildberg");
-    fw.set(list2, events2);
+    fw.set(list2, events2, false);
   }
 
   if (inOut) {
@@ -110,10 +110,10 @@ void testFW2(bool inOut, bool althlbz) {
   if (althlbz) {
     if (inOut) {
       Serial.println("Nach Althengstett");
-      fw.set(calwAlth, evCalwAlth);
+      fw.set(calwAlth, evCalwAlth, false);
     } else {
       Serial.println("Von Althengstett");
-      fw.set(althCalw, evAlthCalw);
+      fw.set(althCalw, evAlthCalw, false);
     }
 
     if (inOut) {
@@ -128,10 +128,10 @@ void testFW2(bool inOut, bool althlbz) {
   } else {
     if (inOut) {
       Serial.println("Nach Liebenzell");
-      fw.set(calwLieb, evCalwLieb);
+      fw.set(calwLieb, evCalwLieb, false);
     } else {
       Serial.println("Von Liebenzell");
-      fw.set(liebCalw, evLiebCalw);
+      fw.set(liebCalw, evLiebCalw, false);
     }
 
     if (inOut) {
@@ -214,6 +214,10 @@ void setup() {
 
 
 void loop() {
+  if (digitalRead(FWBLOCK_PIN) == 0) {
+    return;
+  }
+  
   unsigned long now = millis();
   world->test(now);
   if (ledsChanged) {

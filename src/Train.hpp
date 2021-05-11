@@ -9,6 +9,7 @@ class Train {
     void init(CRGB* leds, CRGB trainColor, CRGB trackColor);
     void advance(short toPosition);
     bool isEmpty();
+    void redraw();
     
   private:
     CRGB* m_leds;
