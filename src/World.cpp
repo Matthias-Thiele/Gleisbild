@@ -1,7 +1,7 @@
 #include "World.hpp"
 #include "Events.hpp"
 
-#define BRIGHTNESS  64
+#define BRIGHTNESS  255
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 
@@ -12,39 +12,167 @@ short lbefs[] = {315, 385, -1};
 unsigned long lbefsev[] = {
   SET_SIGNAL | (8ul << 12) | 320ul,
   RESET_SIGNAL | (8ul << 12) | 335ul,
+  STOP_TRAIN | 383ul,
   0
 };
 
-short lbt1[] = {315, 389, 204, 165, -1};
+short lbt1[] = {315, 389, 204, 155, -1};
 unsigned long lbt1234ev[] = {
   SET_SIGNAL | (8ul << 12) | 320ul,
   RESET_SIGNAL | (8ul << 12) | 335ul,
   SET_SIGNAL | (6ul << 12) | 370ul,
   RESET_SIGNAL | (6ul << 12) | 190ul,
   RESET_SIGNAL | (6ul << 12) | 56ul,
+  STOP_TRAIN | 164ul,
+  STOP_TRAIN | 94ul,
+  STOP_TRAIN | 7ul,
+  STOP_TRAIN | 441ul,
   0
 };
-short lbt2[] = {315, 389, 204, 203, 61, 55, 62, 93, -1};
-short lbt3[] = {315, 389, 204, 203, 61, 48, 33, 8, -1};
-short lbt4[] = {315, 389, 204, 203, 61, 43, 420, 441, -1};
+short lbt2[] = {315, 389, 204, 203, 61, 55, 62, 103, -1};
+short lbt3[] = {315, 389, 204, 203, 61, 48, 33, 3, -1};
+short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 450, -1};
 
 // Einfahrt von Althengstett
-short ahefs[] = {280, 211, -1};
+short ahefs[] = {280, 207, -1};
 unsigned long ahefsev[] = {
   SET_SIGNAL | (5ul << 12) | 275ul,
   RESET_SIGNAL | (5ul << 12) | 260ul,
+  STOP_TRAIN | 211ul,
   0
 };
-short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 93, -1};
+
+short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
 unsigned long aht234ev[] = {
   SET_SIGNAL | (5ul << 12) | 275ul,
   RESET_SIGNAL | (5ul << 12) | 260ul,
   SET_SIGNAL | (3ul << 12) | 220ul,
   RESET_SIGNAL | (3ul << 12) | 392ul,
+  STOP_TRAIN | 94ul,
+  STOP_TRAIN | 7ul,
+  STOP_TRAIN | 441ul,
   0
 };
-short aht3[] = {280, 206, 391, 402, 48, 49, 33, 8, -1};
-short aht4[] = {280, 206, 391, 393, 403, 441, -1};
+short aht3[] = {280, 206, 391, 402, 48, 49, 33, 3, -1};
+short aht4[] = {280, 206, 391, 393, 403, 450, -1};
+
+// Einfahrt von Wildberg
+short wbefs[] = {544, 558, 529, 473, -1};
+unsigned long wbefsev[] = {
+  SET_SIGNAL | (2ul << 12) | 544ul,
+  RESET_SIGNAL | (2ul << 12) | 520ul,
+  STOP_TRAIN | 475ul,
+  0
+};
+
+short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
+unsigned long wbt124ev[] = {
+  SET_SIGNAL | (2ul << 12) | 544ul,
+  RESET_SIGNAL | (2ul << 12) | 520ul,
+  SET_SIGNAL | (0ul << 12) | 490ul,
+  RESET_SIGNAL | (0ul << 12) | 140ul,
+  RESET_SIGNAL | (0ul << 12) | 110ul,
+  RESET_SIGNAL | (0ul << 12) | 470ul,
+  STOP_TRAIN | 170ul,
+  STOP_TRAIN | 88ul,
+  STOP_TRAIN | 435,
+  0
+};
+short wbt2[] = {544, 558, 529, 469, 130, 125, 122, 78, -1};
+short wbt4[] = {544, 558, 529, 469, 130, 125, 122, 119, 467, 425, -1};
+
+// Ausfahrt nach Wildberg
+short cwbt1[] = {168, 130, 469, 543, -1};
+unsigned long cwbt1ev[] = {
+  SET_SIGNAL | (9ul << 12) | 166ul,
+  RESET_SIGNAL | (9ul << 12) | 135ul,
+  SET_SIGNAL | (1ul << 12) | 500ul,
+  RESET_SIGNAL | (1ul << 12) | 540ul,
+  0
+};
+
+short cwbt2[] = {89, 122, 125, 129, 130, 130, 469, 543, -1};
+unsigned long cwbt2ev[] = {
+  SET_SIGNAL | (10ul << 12) | 82ul,
+  RESET_SIGNAL | (10ul << 12) | 129ul,
+  SET_SIGNAL | (1ul << 12) | 500ul,
+  RESET_SIGNAL | (1ul << 12) | 540ul,
+  0
+};
+
+short cwbt4[] = {436, 467, 119, 122, 125, 129, 130, 130, 469, 543, -1};
+unsigned long cwbt4ev[] = {
+  SET_SIGNAL | (11ul << 12) | 439ul,
+  RESET_SIGNAL | (11ul << 12) | 460ul,
+  SET_SIGNAL | (1ul << 12) | 500ul,
+  RESET_SIGNAL | (1ul << 12) | 540ul,
+  0
+};
+
+// Ausfahrt nach Liebenzell
+short clbt1[] = {165, 204, 389, 329, 300, 314, -1};
+unsigned long clbt1ev[] = {
+  SET_SIGNAL | (15ul << 12) | 166ul,
+  RESET_SIGNAL | (15ul << 12) | 190ul,
+  SET_SIGNAL | (7ul << 12) | 350ul,
+  RESET_SIGNAL | (7ul << 12) | 305ul,
+  0
+};
+
+short clbt2[] = {93, 62, 56, 61, 203, 204, 389, 329, 300, 314, -1};
+unsigned long clbt2ev[] = {
+  SET_SIGNAL | (14ul << 12) | 88ul,
+  RESET_SIGNAL | (14ul << 12) | 60ul,
+  SET_SIGNAL | (7ul << 12) | 350ul,
+  RESET_SIGNAL | (7ul << 12) | 305ul,
+  0
+};
+
+short clbt3[] = {8, 33, 49, 61, 203, 204, 389, 329, 300, 314, -1};
+unsigned long clbt3ev[] = {
+  SET_SIGNAL | (13ul << 12) | 10ul,
+  RESET_SIGNAL | (13ul << 12) | 30ul,
+  SET_SIGNAL | (7ul << 12) | 350ul,
+  RESET_SIGNAL | (7ul << 12) | 305ul,
+  0
+};
+
+short clbt4[] = {440, 420, 43, 61, 203, 204, 389, 329, 300, 314, -1};
+unsigned long clbt4ev[] = {
+  SET_SIGNAL | (12ul << 12) | 430ul,
+  RESET_SIGNAL | (12ul << 12) | 420ul,
+  SET_SIGNAL | (7ul << 12) | 350ul,
+  RESET_SIGNAL | (7ul << 12) | 305ul,
+  0
+};
+
+// Ausfahrt nach Althengstett
+short caht2[] = {93, 73, 38, 42, 33, 33, 48, 49, 402, 391, 206, 266, 295, 281, -1};
+unsigned long caht2ev[] = {
+  SET_SIGNAL | (14ul << 12) | 95ul,
+  RESET_SIGNAL | (14ul << 12) | 73ul,
+  SET_SIGNAL | (4ul << 12) | 250ul,
+  RESET_SIGNAL | (4ul << 12) | 290ul,
+  0
+};
+
+short caht3[] = {8, 33, 48, 49, 402, 391, 206, 266, 295, 281, -1};
+unsigned long caht3ev[] = {
+  SET_SIGNAL | (13ul << 12) | 10ul,
+  RESET_SIGNAL | (13ul << 12) | 25ul,
+  SET_SIGNAL | (4ul << 12) | 250ul,
+  RESET_SIGNAL | (4ul << 12) | 290ul,
+  0
+};
+
+short caht4[] = {440, 403, 393, 391, 206, 266, 295, 281, -1};
+unsigned long caht4ev[] = {
+  SET_SIGNAL | (12ul << 12) | 438ul,
+  RESET_SIGNAL | (12ul << 12) | 410ul,
+  SET_SIGNAL | (4ul << 12) | 250ul,
+  RESET_SIGNAL | (4ul << 12) | 290ul,
+  0
+};
 
 World::World() {
   CRGB clearColor = {0, 0, 0};
@@ -118,7 +246,50 @@ void World::initFahrstrassen() {
 
   // Althengstett auf Gleis 4
   fahrwege[FW_AH_T4]->set(aht4, aht234ev);
-}
+
+  // Wildberg bis zum Einfahrtsignal
+  fahrwege[FW_WB_EFS]->set(wbefs, wbefsev);
+
+  // Wildberg auf Gleis 1
+  fahrwege[FW_WB_T1]->set(wbt1, wbt124ev);
+
+  // Wildberg auf Gleis 2
+  fahrwege[FW_WB_T2]->set(wbt2, wbt124ev);
+
+  // Wildberg auf Gleis 4
+  fahrwege[FW_WB_T4]->set(wbt4, wbt124ev);
+
+  // Nach Wildberg von Gleis 1
+  fahrwege[FW_T1_WB]->set(cwbt1, cwbt1ev);
+
+  // Nach Wildberg von Gleis 2
+  fahrwege[FW_T2_WB]->set(cwbt2, cwbt2ev);
+
+  // Nach Wildberg von Gleis 4
+  fahrwege[FW_T4_WB]->set(cwbt4, cwbt4ev);
+
+  // Nach Liebenzell von Gleis 1
+  fahrwege[FW_T1_LB]->set(clbt1, clbt1ev);
+
+  // Nach Liebenzell von Gleis 2
+  fahrwege[FW_T2_LB]->set(clbt2, clbt2ev);
+
+  // Nach Liebenzell von Gleis 3
+  fahrwege[FW_T3_LB]->set(clbt3, clbt3ev);
+
+  // Nach Liebenzell von Gleis 4
+  fahrwege[FW_T4_LB]->set(clbt4, clbt4ev);
+
+  // Nach Althengstett von Gleis 2
+  fahrwege[FW_T2_AH]->set(caht2, caht2ev);
+
+  // Nach Althengstett von Gleis 3
+  fahrwege[FW_T3_AH]->set(caht3, caht3ev);
+
+  // Nach Althengstett von Gleis 4
+  fahrwege[FW_T4_AH]->set(caht4, caht4ev);
+
+ }
 
 int activeFW = -1;
 unsigned long lastStep = 0;
@@ -132,11 +303,13 @@ void World::test(unsigned long now) {
   if (activeFW >= 0) {
     if (fahrwege[activeFW]->done()) {
       Serial.println("Fahrstrasse done.");
-      delay(1000);
+      delay(500);
       fahrwege[activeFW]->clear();
       activeFW++;
-      if (activeFW > 8) {
-        activeFW = 0;
+      if (activeFW > 14) {
+        activeFW = 8;
+      } else {
+        activeFW = 22;
       }
       Serial.print("Show Fahrstrasse "); Serial.println(activeFW);
       fahrwege[activeFW]->show();
@@ -144,11 +317,11 @@ void World::test(unsigned long now) {
   }
 
   if (activeFW < 0) {
-    activeFW = 5;
+    activeFW = 22;
     fahrwege[activeFW]->show();
   }
 
   //Serial.println("Advance");
   fahrwege[activeFW]->advance();
-  lastStep = now + 60;
+  lastStep = now + 50;
 }

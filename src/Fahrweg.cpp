@@ -78,7 +78,7 @@ void Fahrweg::advance() {
     unsigned long* evp = m_eventList;
     while (unsigned long ev = *evp++) {
       if (((short)(ev & 0xffful)) == pos) {
-        int sig = (ev >> 12) & 0xff;
+      int sig = (ev >> 12) & 0xff;
       Serial.print("now at pos "); Serial.print(pos);
       Serial.print(", Signal "); Serial.println(sig);
       Serial.print(", Event "); Serial.println(ev >> 20);
@@ -93,6 +93,11 @@ void Fahrweg::advance() {
             Serial.print(" Reset signal "); Serial.println(sig);
             break;
         
+          case STOP_TRAIN:
+            Serial.println("Train stopped");
+            m_shown = false;
+            return;
+
           case WAIT_FOR_SIGNAL:
             if (!g_signals[sig].isSet()) {
               Serial.print(" Wait for signal "); Serial.println(sig);

@@ -12,7 +12,7 @@
 
 #define NUM_LEDS 580
 #define NUM_SIGNALS 16
-#define NUM_FAHRWEGE 20
+#define NUM_FAHRWEGE 24
 #define LED_PIN     5
 
 #define FW_LB_EFS 0
@@ -24,6 +24,20 @@
 #define FW_AH_T2 6
 #define FW_AH_T3 7
 #define FW_AH_T4 8
+#define FW_WB_EFS 9
+#define FW_WB_T1 10
+#define FW_WB_T2 11
+#define FW_WB_T4 12
+#define FW_T1_WB 13
+#define FW_T2_WB 14
+#define FW_T4_WB 15
+#define FW_T1_LB 16
+#define FW_T2_LB 17
+#define FW_T3_LB 18
+#define FW_T4_LB 19
+#define FW_T2_AH 20
+#define FW_T3_AH 21
+#define FW_T4_AH 22
 
 
 class World {
