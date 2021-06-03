@@ -45,6 +45,7 @@ class World {
     World();
     void addTrain(int startingPoint);
     void test(unsigned long now);
+    void setSignal(int num, bool value);
 
   private:
     CRGB leds[NUM_LEDS];

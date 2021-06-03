@@ -96,7 +96,7 @@ unsigned long cwbt1ev[] = {
 
 short cwbt2[] = {89, 122, 125, 129, 130, 130, 469, 543, -1};
 unsigned long cwbt2ev[] = {
-  SET_SIGNAL | (10ul << 12) | 82ul,
+  SET_SIGNAL | (10ul << 12) | 91ul,
   RESET_SIGNAL | (10ul << 12) | 129ul,
   SET_SIGNAL | (1ul << 12) | 500ul,
   RESET_SIGNAL | (1ul << 12) | 540ul,
@@ -152,7 +152,7 @@ unsigned long clbt4ev[] = {
 // Ausfahrt nach Althengstett
 short caht2[] = {93, 73, 38, 42, 33, 33, 48, 49, 402, 391, 206, 266, 295, 281, -1};
 unsigned long caht2ev[] = {
-  SET_SIGNAL | (14ul << 12) | 95ul,
+  SET_SIGNAL | (14ul << 12) | 91ul,
   RESET_SIGNAL | (14ul << 12) | 73ul,
   SET_SIGNAL | (4ul << 12) | 250ul,
   RESET_SIGNAL | (4ul << 12) | 290ul,
@@ -293,6 +293,14 @@ void World::initFahrstrassen() {
   fahrwege[FW_T4_AH]->set(caht4, caht4ev, false);
 
  }
+
+void World::setSignal(int num, bool value) {
+  if (value) {
+    signals[num].set();
+  } else {
+    signals[num].release();
+  }
+}
 
 int activeFW = -1;
 unsigned long lastStep = 0;
