@@ -3,3 +3,20 @@
 #define RESET_SIGNAL 0x200000ul
 #define WAIT_FOR_SIGNAL 0x400000ul
 #define STOP_TRAIN 0x800000ul
+
+#define WAIT_FOR_BLOCK 0x1000000ul
+#define BLOCK_LB 0x1000ul
+#define BLOCK_AH 0x2000ul
+#define BLOCK_WB 0x3000ul
+#define BLOCK_IS_REMOTE 0x8000ul
+
+#define TRACK 0x2000000ul
+#define TRACK_RELEASE 0x1000ul
+#define TRACK_ALLOCATE 0x2000ul
+#define TRACK_1 0
+#define TRACK_2 1
+#define TRACK_3 2
+#define TRACK_4 3
+
+
+#define ONLY_TEST 0x8000000ul

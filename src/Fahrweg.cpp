@@ -4,10 +4,11 @@
 
 extern bool ledsChanged;
 Signal* g_signals;
+bool g_isTestMode;
 
 static void trainHandler(AsyncTimer *timer, unsigned long now, void* source) {
   Fahrweg* fw = (Fahrweg*)source;
-  fw->advance();
+  fw->advance(g_isTestMode);
 }
 
 void Fahrweg::setSignals(Signal* signals) {
@@ -24,6 +25,7 @@ Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor) {
 }
 
 void Fahrweg::clear() {
+  Serial.println("Clear fahrweg");
   if (!m_fahrwegItems) {
     return;
   }
@@ -31,20 +33,22 @@ void Fahrweg::clear() {
   m_fwi.setFahrwegList(m_fahrwegItems);
   CRGB clearColor = {0, 0, 0};
 
-Serial.print("Clear: ");
   while (m_fwi.hasMore()) {
     int pos = m_fwi.nextPos();
     if (pos < 0 || pos > 600) {
       Serial.println("+++++ Error +++++++++");
       delay(1000);
     } else {
-Serial.print(pos); Serial.print(", ") ;
       m_leds[pos] = clearColor;
     }
   }
 
-Serial.println(".");
   ledsChanged = true;
+  m_shown = false;
+}
+
+bool Fahrweg::isShown() {
+  return m_shown;
 }
 
 void Fahrweg::show() {
@@ -73,7 +77,12 @@ void Fahrweg::start() {
   m_timer = AsyncTimer::add(50, -1, this, trainHandler);
 }
 
-void Fahrweg::advance() {
+void Fahrweg::setBlock(bool isRemote) {
+  m_sectionBlockIsRemote = isRemote;
+}
+
+void Fahrweg::advance(bool testMode) {
+  g_isTestMode = testMode;
   if (m_fwi.hasMore() || (!m_isInbound && !m_train.isEmpty())) {
   //if (m_fwi.hasMore()) {
     short pos = m_fwi.peekPos();
@@ -83,10 +92,17 @@ void Fahrweg::advance() {
     while (unsigned long ev = *evp++) {
       if (((short)(ev & 0xffful)) == pos) {
       int sig = (ev >> 12) & 0xff;
-      Serial.print("now at pos "); Serial.print(pos);
-      Serial.print(", Signal "); Serial.println(sig);
-      Serial.print(", Event "); Serial.println(ev >> 20);
+      bool isRemote = sig & BLOCK_IS_REMOTE;
+      //Serial.print("now at pos "); Serial.print(pos);
+      //Serial.print(", Signal "); Serial.println(sig);
+      //Serial.print(", Event "); Serial.println(ev >> 20);
         switch (ev & 0xf00000) {
+          case WAIT_FOR_BLOCK:
+            if (!testMode && (m_sectionBlockIsRemote != isRemote)) {
+              Serial.println("Wait for section block.");
+              return;
+            }
+
           case SET_SIGNAL:
             g_signals[sig].set();
             Serial.print(" Set signal "); Serial.println(sig);
@@ -110,8 +126,8 @@ void Fahrweg::advance() {
             return;
 
           case WAIT_FOR_SIGNAL:
-            if (!g_signals[sig].isSet()) {
-              Serial.print(" Wait for signal "); Serial.println(sig);
+            if (!testMode && !g_signals[sig].isSet()) {
+              //Serial.print(" Wait for signal "); Serial.println(sig);
               return;
             }
             break;

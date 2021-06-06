@@ -5,6 +5,8 @@
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 
+extern bool ledsChanged;
+
 unsigned long dummyEventList[] = {0};
 int testList[] = {FW_AH_T3, FW_WB_T2, FW_LB_T4, FW_T3_LB, FW_T2_AH, FW_LB_T1, FW_T1_WB, FW_LB_T3, FW_T4_AH, FW_WB_T4,
                   FW_T4_LB, FW_T3_AH, FW_WB_T1, FW_LB_T2, FW_AH_T4, FW_T1_LB, FW_T2_WB, FW_T4_WB, FW_AH_T2, FW_T2_LB, 
@@ -13,19 +15,21 @@ int testList[] = {FW_AH_T3, FW_WB_T2, FW_LB_T4, FW_T3_LB, FW_T2_AH, FW_LB_T1, FW
 // Einfahrt von Bad Liebenzell
 short lbefs[] = {315, 385, -1};
 unsigned long lbefsev[] = {
-  SET_SIGNAL | (8ul << 12) | 320ul,
-  RESET_SIGNAL | (8ul << 12) | 335ul,
-  STOP_TRAIN | 383ul,
+  WAIT_FOR_BLOCK | BLOCK_LB | BLOCK_IS_REMOTE | 319ul,
+  SET_SIGNAL | (11ul << 12) | 319ul,
+  RESET_SIGNAL | (11ul << 12) | 335ul,
+  WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
   0
 };
 
 short lbt1[] = {315, 389, 204, 155, -1};
 unsigned long lbt1234ev[] = {
-  SET_SIGNAL | (8ul << 12) | 320ul,
-  RESET_SIGNAL | (8ul << 12) | 335ul,
-  SET_SIGNAL | (6ul << 12) | 370ul,
-  RESET_SIGNAL | (6ul << 12) | 190ul,
-  RESET_SIGNAL | (6ul << 12) | 56ul,
+  WAIT_FOR_BLOCK | BLOCK_LB | 319ul,
+  SET_SIGNAL | (11ul << 12) | 320ul,
+  RESET_SIGNAL | (11ul << 12) | 335ul,
+  SET_SIGNAL | (0ul << 12) | 370ul | ONLY_TEST,
+  RESET_SIGNAL | (0ul << 12) | 190ul | ONLY_TEST,
+  RESET_SIGNAL | (0ul << 12) | 56ul | ONLY_TEST,
   STOP_TRAIN | 164ul,
   STOP_TRAIN | 94ul,
   STOP_TRAIN | 7ul,
@@ -39,18 +43,18 @@ short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 450, -1};
 // Einfahrt von Althengstett
 short ahefs[] = {280, 207, -1};
 unsigned long ahefsev[] = {
-  SET_SIGNAL | (5ul << 12) | 275ul,
-  RESET_SIGNAL | (5ul << 12) | 260ul,
+  SET_SIGNAL | (13ul << 12) | 275ul,
+  RESET_SIGNAL | (13ul << 12) | 260ul,
   STOP_TRAIN | 211ul,
   0
 };
 
 short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
 unsigned long aht234ev[] = {
-  SET_SIGNAL | (5ul << 12) | 275ul,
-  RESET_SIGNAL | (5ul << 12) | 260ul,
-  SET_SIGNAL | (3ul << 12) | 220ul,
-  RESET_SIGNAL | (3ul << 12) | 392ul,
+  SET_SIGNAL | (13ul << 12) | 275ul,
+  RESET_SIGNAL | (13ul << 12) | 260ul,
+  SET_SIGNAL | (1ul << 12) | 220ul,
+  RESET_SIGNAL | (1ul << 12) | 392ul,
   STOP_TRAIN | 94ul,
   STOP_TRAIN | 7ul,
   STOP_TRAIN | 441ul,
@@ -62,20 +66,20 @@ short aht4[] = {280, 206, 391, 393, 403, 450, -1};
 // Einfahrt von Wildberg
 short wbefs[] = {544, 558, 529, 473, -1};
 unsigned long wbefsev[] = {
-  SET_SIGNAL | (2ul << 12) | 544ul,
-  RESET_SIGNAL | (2ul << 12) | 520ul,
+  SET_SIGNAL | (15ul << 12) | 544ul,
+  RESET_SIGNAL | (15ul << 12) | 520ul,
   STOP_TRAIN | 475ul,
   0
 };
 
 short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
 unsigned long wbt124ev[] = {
-  SET_SIGNAL | (2ul << 12) | 544ul,
-  RESET_SIGNAL | (2ul << 12) | 520ul,
-  SET_SIGNAL | (0ul << 12) | 490ul,
-  RESET_SIGNAL | (0ul << 12) | 140ul,
-  RESET_SIGNAL | (0ul << 12) | 110ul,
-  RESET_SIGNAL | (0ul << 12) | 470ul,
+  SET_SIGNAL | (15ul << 12) | 544ul,
+  RESET_SIGNAL | (15ul << 12) | 520ul,
+  SET_SIGNAL | (2ul << 12) | 490ul,
+  RESET_SIGNAL | (2ul << 12) | 140ul,
+  RESET_SIGNAL | (2ul << 12) | 110ul,
+  RESET_SIGNAL | (2ul << 12) | 470ul,
   STOP_TRAIN | 170ul,
   STOP_TRAIN | 88ul,
   STOP_TRAIN | 435,
@@ -87,93 +91,93 @@ short wbt4[] = {544, 558, 529, 469, 130, 125, 122, 119, 467, 425, -1};
 // Ausfahrt nach Wildberg
 short cwbt1[] = {169, 130, 469, 543, -1};
 unsigned long cwbt1ev[] = {
-  SET_SIGNAL | (9ul << 12) | 166ul,
-  RESET_SIGNAL | (9ul << 12) | 135ul,
-  SET_SIGNAL | (1ul << 12) | 500ul,
-  RESET_SIGNAL | (1ul << 12) | 540ul,
+  SET_SIGNAL | (7ul << 12) | 166ul,
+  RESET_SIGNAL | (7ul << 12) | 135ul,
+  SET_SIGNAL | (14ul << 12) | 500ul,
+  RESET_SIGNAL | (14ul << 12) | 540ul,
   0
 };
 
 short cwbt2[] = {89, 122, 125, 129, 130, 130, 469, 543, -1};
 unsigned long cwbt2ev[] = {
-  SET_SIGNAL | (10ul << 12) | 91ul,
-  RESET_SIGNAL | (10ul << 12) | 129ul,
-  SET_SIGNAL | (1ul << 12) | 500ul,
-  RESET_SIGNAL | (1ul << 12) | 540ul,
+  SET_SIGNAL | (8ul << 12) | 91ul,
+  RESET_SIGNAL | (8ul << 12) | 129ul,
+  SET_SIGNAL | (14ul << 12) | 500ul,
+  RESET_SIGNAL | (14ul << 12) | 540ul,
   0
 };
 
 short cwbt4[] = {436, 467, 119, 122, 125, 129, 130, 130, 469, 543, -1};
 unsigned long cwbt4ev[] = {
-  SET_SIGNAL | (11ul << 12) | 439ul,
-  RESET_SIGNAL | (11ul << 12) | 460ul,
-  SET_SIGNAL | (1ul << 12) | 500ul,
-  RESET_SIGNAL | (1ul << 12) | 540ul,
+  SET_SIGNAL | (9ul << 12) | 439ul,
+  RESET_SIGNAL | (9ul << 12) | 460ul,
+  SET_SIGNAL | (14ul << 12) | 500ul,
+  RESET_SIGNAL | (14ul << 12) | 540ul,
   0
 };
 
 // Ausfahrt nach Liebenzell
 short clbt1[] = {165, 204, 389, 329, 300, 314, -1};
 unsigned long clbt1ev[] = {
-  SET_SIGNAL | (15ul << 12) | 166ul,
-  RESET_SIGNAL | (15ul << 12) | 190ul,
-  SET_SIGNAL | (7ul << 12) | 350ul,
-  RESET_SIGNAL | (7ul << 12) | 305ul,
+  SET_SIGNAL | (3ul << 12) | 166ul,
+  RESET_SIGNAL | (3ul << 12) | 190ul,
+  SET_SIGNAL | (10ul << 12) | 350ul,
+  RESET_SIGNAL | (10ul << 12) | 305ul,
   0
 };
 
 short clbt2[] = {93, 62, 56, 61, 203, 204, 389, 329, 300, 314, -1};
 unsigned long clbt2ev[] = {
-  SET_SIGNAL | (14ul << 12) | 88ul,
-  RESET_SIGNAL | (14ul << 12) | 60ul,
-  SET_SIGNAL | (7ul << 12) | 350ul,
-  RESET_SIGNAL | (7ul << 12) | 305ul,
+  SET_SIGNAL | (4ul << 12) | 88ul,
+  RESET_SIGNAL | (4ul << 12) | 60ul,
+  SET_SIGNAL | (10ul << 12) | 350ul,
+  RESET_SIGNAL | (10ul << 12) | 305ul,
   0
 };
 
 short clbt3[] = {8, 33, 49, 61, 203, 204, 389, 329, 300, 314, -1};
 unsigned long clbt3ev[] = {
-  SET_SIGNAL | (13ul << 12) | 10ul,
-  RESET_SIGNAL | (13ul << 12) | 30ul,
-  SET_SIGNAL | (7ul << 12) | 350ul,
-  RESET_SIGNAL | (7ul << 12) | 305ul,
+  SET_SIGNAL | (5ul << 12) | 10ul,
+  RESET_SIGNAL | (5ul << 12) | 30ul,
+  SET_SIGNAL | (10ul << 12) | 350ul,
+  RESET_SIGNAL | (10ul << 12) | 305ul,
   0
 };
 
 short clbt4[] = {440, 420, 43, 61, 203, 204, 389, 329, 300, 314, -1};
 unsigned long clbt4ev[] = {
-  SET_SIGNAL | (12ul << 12) | 430ul,
-  RESET_SIGNAL | (12ul << 12) | 420ul,
-  SET_SIGNAL | (7ul << 12) | 350ul,
-  RESET_SIGNAL | (7ul << 12) | 305ul,
+  SET_SIGNAL | (6ul << 12) | 430ul,
+  RESET_SIGNAL | (6ul << 12) | 420ul,
+  SET_SIGNAL | (10ul << 12) | 350ul,
+  RESET_SIGNAL | (10ul << 12) | 305ul,
   0
 };
 
 // Ausfahrt nach Althengstett
 short caht2[] = {93, 73, 38, 42, 33, 33, 48, 49, 402, 391, 206, 266, 295, 281, -1};
 unsigned long caht2ev[] = {
-  SET_SIGNAL | (14ul << 12) | 91ul,
-  RESET_SIGNAL | (14ul << 12) | 73ul,
-  SET_SIGNAL | (4ul << 12) | 250ul,
-  RESET_SIGNAL | (4ul << 12) | 290ul,
+  SET_SIGNAL | (4ul << 12) | 91ul,
+  RESET_SIGNAL | (4ul << 12) | 73ul,
+  SET_SIGNAL | (12ul << 12) | 250ul,
+  RESET_SIGNAL | (12ul << 12) | 290ul,
   0
 };
 
 short caht3[] = {8, 33, 48, 49, 402, 391, 206, 266, 295, 281, -1};
 unsigned long caht3ev[] = {
-  SET_SIGNAL | (13ul << 12) | 10ul,
-  RESET_SIGNAL | (13ul << 12) | 25ul,
-  SET_SIGNAL | (4ul << 12) | 250ul,
-  RESET_SIGNAL | (4ul << 12) | 290ul,
+  SET_SIGNAL | (5ul << 12) | 10ul,
+  RESET_SIGNAL | (5ul << 12) | 25ul,
+  SET_SIGNAL | (12ul << 12) | 250ul,
+  RESET_SIGNAL | (12ul << 12) | 290ul,
   0
 };
 
 short caht4[] = {440, 403, 393, 391, 206, 266, 295, 281, -1};
 unsigned long caht4ev[] = {
-  SET_SIGNAL | (12ul << 12) | 438ul,
-  RESET_SIGNAL | (12ul << 12) | 410ul,
-  SET_SIGNAL | (4ul << 12) | 250ul,
-  RESET_SIGNAL | (4ul << 12) | 290ul,
+  SET_SIGNAL | (6ul << 12) | 438ul,
+  RESET_SIGNAL | (6ul << 12) | 410ul,
+  SET_SIGNAL | (12ul << 12) | 250ul,
+  RESET_SIGNAL | (12ul << 12) | 290ul,
   0
 };
 
@@ -192,22 +196,22 @@ World::World() {
 
 void World::initSignals() {
   Signal::setLeds(leds);
-  signals[0].setLedNo(468); // Einf. Calw von WB
-  signals[1].setLedNo(559); // Einf. WB von Calw
-  signals[2].setLedNo(560); // Ausf. WB nach Calw
-  signals[3].setLedNo(205); // Einf. Calw von AH
-  signals[4].setLedNo(296); // Einf. AH von Calw
-  signals[5].setLedNo(297); // Ausf. AH nach Calw
-  signals[6].setLedNo(390); // Einf. Calw von LB
-  signals[7].setLedNo(298); // Einf. LB von Calw
-  signals[8].setLedNo(299); // Ausf. LB nach Calw
-  signals[9].setLedNo(0);   // Ausf. G1 nach WB
-  signals[10].setLedNo(1);  // Ausf. G2 nach WB
-  signals[11].setLedNo(2);  // Ausf. G4 nach WB
-  signals[12].setLedNo(34); // Ausf. G4 nach LB/ AH
-  signals[13].setLedNo(35); // Ausf. G3 nach LB/ AH
-  signals[14].setLedNo(36); // Ausf. G2 nach LB/ AH
-  signals[15].setLedNo(37); // Ausf. G1 nach LB
+  signals[0].setLedNo(390); // Einf. Calw von LB
+  signals[1].setLedNo(205); // Einf. Calw von AH
+  signals[2].setLedNo(468); // Einf. Calw von WB
+  signals[3].setLedNo(37); // Ausf. G1 nach LB
+  signals[4].setLedNo(36); // Ausf. G2 nach LB/ AH
+  signals[5].setLedNo(35); // Ausf. G3 nach LB/ AH
+  signals[6].setLedNo(34); // Ausf. G4 nach LB/ AH
+  signals[7].setLedNo(0);   // Ausf. G1 nach WB
+  signals[8].setLedNo(1);  // Ausf. G2 nach WB
+  signals[9].setLedNo(2);  // Ausf. G4 nach WB
+  signals[10].setLedNo(298); // Einf. LB von Calw
+  signals[11].setLedNo(299); // Ausf. LB nach Calw
+  signals[12].setLedNo(296); // Einf. AH von Calw
+  signals[13].setLedNo(297); // Ausf. AH nach Calw
+  signals[14].setLedNo(559); // Einf. WB von Calw
+  signals[15].setLedNo(560); // Ausf. WB nach Calw
 
   for (int i = 0; i < NUM_SIGNALS; i++) {
     signals[i].release();
@@ -294,6 +298,129 @@ void World::initFahrstrassen() {
 
  }
 
+void World::processCommand(uint8_t cmd) {
+  if (m_isTestMode) {
+    return;
+  }
+
+  uint8_t pk = (cmd >> 4) & 0xf;
+  //Serial.print("From Mega2 "); Serial.print(cmd, HEX); Serial.print(", "); Serial.println(pk);
+  switch (pk) {
+    case 0:
+    case 1:
+      // Signalhebel
+      for (int i = 0; i < 4; i++) {
+        setSignal((pk << 2) + i, !(cmd & (1 << (i & 0xf))));
+      }
+
+      break;
+
+    case 2:
+      // Zugmeldung
+      checkStartTrain(cmd & 0x7);
+      break;
+
+    case 3:
+      // Streckenblock
+      updateStreckenblock(cmd & 0x7);
+      break;
+
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+      setFahrstrasse(cmd);
+      break;
+  }
+
+  ledsChanged = true;
+}
+
+void World::checkStartTrain(uint8_t source) {
+  uint8_t shiftedSource = source;
+  uint8_t shiftedLast = m_lastStart;
+
+  for (uint8_t i = 0; i < 3; i++) {
+    if (!(shiftedLast & 1) && (shiftedSource & 1)) {
+      Serial.print("Start train "); Serial.println(i);
+      startTrain(i);
+    }
+
+    shiftedSource >>= 1;
+    shiftedLast >>= 1;
+  }
+
+  m_lastStart = source;
+}
+
+/**
+ * Section block, lower nibble: 0 <Wildberg> <Althengstett> <Liebenzell>
+ * 1: is remote, 0: is local
+ **/
+void World::updateStreckenblock(uint8_t source) {
+  for (uint8_t i = 0; i < 3; i++) {
+    if ((source & 1) != m_streckeIsRemote[i]) {
+      Serial.print("Switch block "); Serial.print(i); Serial.print(" to "); Serial.println(source & 1);
+    }
+    m_streckeIsRemote[i] = source & 1;
+    source >>= 1;
+  }
+}
+
+void World::startTrain(uint8_t source) {
+  switch (source) {
+    case 0:
+      m_fromLB = fahrwege[FW_LB_EFS];
+      m_fromLB->show();
+      break;
+    case 1:
+      m_fromAH = fahrwege[FW_AH_EFS];
+      m_fromAH->show();
+      break;
+    case 2:
+      m_fromWB = fahrwege[FW_WB_EFS];
+      m_fromWB->show();
+      break;
+  }
+}
+
+void World::changeFW(uint8_t fwNum, bool setClear) {
+  if (fahrwege[fwNum]->isShown() != setClear) {
+    if (setClear) {
+      fahrwege[fwNum]->show();
+    } else {
+      fahrwege[fwNum]->clear();
+    }
+  }
+}
+
+void World::setFahrstrasse(uint8_t source) {
+  uint8_t bits = ~(source & 0xf);
+  uint8_t baseValue = (((source >> 4) & 0xf) - 4) << 2;
+  for (uint8_t mask = 8, offset = 0; mask > 0; mask >>= 1, offset++) {
+    uint8_t fsNum = baseValue + offset;
+    if (bits & mask) {
+      if (fsNum <= FW_LB_T4 ) {
+        changeFW(FW_LB_EFS, false);
+      } else if (fsNum <= FW_AH_T4 ) {
+        changeFW(FW_AH_EFS, false);
+      } else if (fsNum <= FW_WB_T4 ) {
+        changeFW(FW_WB_EFS, false);
+      }
+      if (!fahrwege[fsNum]->isShown()) {
+        Serial.print("show fw: "); Serial.println(fsNum);
+        fahrwege[fsNum]->show();
+      }     
+    } else {
+      if (fahrwege[fsNum]->isShown()) {
+        Serial.print("clear fw: "); Serial.println(fsNum);
+        fahrwege[fsNum]->clear();
+      }
+    }
+  }
+}
+
 void World::setSignal(int num, bool value) {
   if (value) {
     signals[num].set();
@@ -302,11 +429,24 @@ void World::setSignal(int num, bool value) {
   }
 }
 
+void World::process(unsigned long now) {
+  m_isTestMode = false;
+  if (now < lastStep) {
+    return;
+  }
+
+  if (m_fromLB && !m_fromLB->done()) {
+    m_fromLB->advance(false);
+  }
+
+  lastStep = now + 100;
+}
+
 int activeFW = -1;
-unsigned long lastStep = 0;
 int activeSg = 0;
 
 void World::test(unsigned long now) {
+  m_isTestMode = true;
   if (now < lastStep) {
     return;
   }
@@ -332,6 +472,6 @@ void World::test(unsigned long now) {
   }
 
   //Serial.println("Advance");
-  fahrwege[testList[activeFW]]->advance();
+  fahrwege[testList[activeFW]]->advance(true);
   lastStep = now + 50;
 }

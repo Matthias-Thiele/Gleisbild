@@ -13,9 +13,11 @@ class Fahrweg {
     void set(short* fahrwegItems, unsigned long* eventList, boolean isInbound);
     void show();
     void start();
-    void advance();
+    void advance(bool testMode);
     bool done();
     void clear();
+    void setBlock(bool isRemote);
+    bool isShown();
 
   private:
     short* m_fahrwegItems;
@@ -27,6 +29,7 @@ class Fahrweg {
     FahrwegIterator m_fwi;
     bool m_shown;
     AsyncTimer* m_timer;
+    bool m_sectionBlockIsRemote;
 };
 
 #endif
