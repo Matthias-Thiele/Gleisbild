@@ -10,6 +10,8 @@ class Train {
     void advance(short toPosition);
     bool isEmpty();
     void redraw();
+    short* getPositions();
+    void setPositions(short* pos);
     
   private:
     CRGB* m_leds;

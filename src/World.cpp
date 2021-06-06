@@ -27,6 +27,8 @@ unsigned long lbt1234ev[] = {
   WAIT_FOR_BLOCK | BLOCK_LB | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
+  WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
+  TRACK | TRACK_ALLOCATE | 384ul,
   SET_SIGNAL | (0ul << 12) | 370ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 190ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 56ul | ONLY_TEST,
@@ -43,9 +45,10 @@ short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 450, -1};
 // Einfahrt von Althengstett
 short ahefs[] = {280, 207, -1};
 unsigned long ahefsev[] = {
+  WAIT_FOR_BLOCK | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
-  STOP_TRAIN | 211ul,
+  WAIT_FOR_SIGNAL | (1ul << 12) | 212ul,
   0
 };
 
@@ -53,8 +56,10 @@ short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
 unsigned long aht234ev[] = {
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
-  SET_SIGNAL | (1ul << 12) | 220ul,
-  RESET_SIGNAL | (1ul << 12) | 392ul,
+  WAIT_FOR_SIGNAL | (1ul << 12) | 212ul,
+  TRACK | TRACK_ALLOCATE | 211ul,
+  SET_SIGNAL | (1ul << 12) | 220ul | ONLY_TEST,
+  RESET_SIGNAL | (1ul << 12) | 392ul | ONLY_TEST,
   STOP_TRAIN | 94ul,
   STOP_TRAIN | 7ul,
   STOP_TRAIN | 441ul,
@@ -68,7 +73,7 @@ short wbefs[] = {544, 558, 529, 473, -1};
 unsigned long wbefsev[] = {
   SET_SIGNAL | (15ul << 12) | 544ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
-  STOP_TRAIN | 475ul,
+  WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
   0
 };
 
@@ -76,10 +81,12 @@ short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
 unsigned long wbt124ev[] = {
   SET_SIGNAL | (15ul << 12) | 544ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
-  SET_SIGNAL | (2ul << 12) | 490ul,
-  RESET_SIGNAL | (2ul << 12) | 140ul,
-  RESET_SIGNAL | (2ul << 12) | 110ul,
-  RESET_SIGNAL | (2ul << 12) | 470ul,
+  WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
+  TRACK | TRACK_ALLOCATE | 469ul,
+  SET_SIGNAL | (2ul << 12) | 490ul | ONLY_TEST,
+  RESET_SIGNAL | (2ul << 12) | 140ul | ONLY_TEST,
+  RESET_SIGNAL | (2ul << 12) | 110ul | ONLY_TEST,
+  RESET_SIGNAL | (2ul << 12) | 470ul | ONLY_TEST,
   STOP_TRAIN | 170ul,
   STOP_TRAIN | 88ul,
   STOP_TRAIN | 435,
@@ -228,73 +235,73 @@ void World::initFahrstrassen() {
   }
 
   // Liebenzell bis zum Einfahrtsignal
-  fahrwege[FW_LB_EFS]->set(lbefs, lbefsev, true);
+  fahrwege[FW_LB_EFS]->set(lbefs, lbefsev, 0xff, true);
 
   // Liebenzell auf Gleis 1
-  fahrwege[FW_LB_T1]->set(lbt1, lbt1234ev, true);
+  fahrwege[FW_LB_T1]->set(lbt1, lbt1234ev, 0, true);
 
   // Liebenzell auf Gleis 2
-  fahrwege[FW_LB_T2]->set(lbt2, lbt1234ev, true);
+  fahrwege[FW_LB_T2]->set(lbt2, lbt1234ev, 1, true);
 
   // Liebenzell auf Gleis 3
-  fahrwege[FW_LB_T3]->set(lbt3, lbt1234ev, true);
+  fahrwege[FW_LB_T3]->set(lbt3, lbt1234ev, 2, true);
 
   // Liebenzell auf Gleis 4
-  fahrwege[FW_LB_T4]->set(lbt4, lbt1234ev, true);
+  fahrwege[FW_LB_T4]->set(lbt4, lbt1234ev, 3, true);
 
   // Althengstett bis zum Einfahrtsignal
-  fahrwege[FW_AH_EFS]->set(ahefs, ahefsev, true);
+  fahrwege[FW_AH_EFS]->set(ahefs, ahefsev, 0xff, true);
 
   // Althengstett auf Gleis 2
-  fahrwege[FW_AH_T2]->set(aht2, aht234ev, true);
+  fahrwege[FW_AH_T2]->set(aht2, aht234ev, 1, true);
 
   // Althengstett auf Gleis 3
-  fahrwege[FW_AH_T3]->set(aht3, aht234ev, true);
+  fahrwege[FW_AH_T3]->set(aht3, aht234ev, 2, true);
 
   // Althengstett auf Gleis 4
-  fahrwege[FW_AH_T4]->set(aht4, aht234ev, true);
+  fahrwege[FW_AH_T4]->set(aht4, aht234ev, 3, true);
 
   // Wildberg bis zum Einfahrtsignal
-  fahrwege[FW_WB_EFS]->set(wbefs, wbefsev, true);
+  fahrwege[FW_WB_EFS]->set(wbefs, wbefsev, 0xff, true);
 
   // Wildberg auf Gleis 1
-  fahrwege[FW_WB_T1]->set(wbt1, wbt124ev, true);
+  fahrwege[FW_WB_T1]->set(wbt1, wbt124ev, 0, true);
 
   // Wildberg auf Gleis 2
-  fahrwege[FW_WB_T2]->set(wbt2, wbt124ev, true);
+  fahrwege[FW_WB_T2]->set(wbt2, wbt124ev, 1, true);
 
   // Wildberg auf Gleis 4
-  fahrwege[FW_WB_T4]->set(wbt4, wbt124ev, true);
+  fahrwege[FW_WB_T4]->set(wbt4, wbt124ev, 3, true);
 
   // Nach Wildberg von Gleis 1
-  fahrwege[FW_T1_WB]->set(cwbt1, cwbt1ev, false);
+  fahrwege[FW_T1_WB]->set(cwbt1, cwbt1ev, 0, false);
 
   // Nach Wildberg von Gleis 2
-  fahrwege[FW_T2_WB]->set(cwbt2, cwbt2ev, false);
+  fahrwege[FW_T2_WB]->set(cwbt2, cwbt2ev, 1, false);
 
   // Nach Wildberg von Gleis 4
-  fahrwege[FW_T4_WB]->set(cwbt4, cwbt4ev, false);
+  fahrwege[FW_T4_WB]->set(cwbt4, cwbt4ev, 3, false);
 
   // Nach Liebenzell von Gleis 1
-  fahrwege[FW_T1_LB]->set(clbt1, clbt1ev, false);
+  fahrwege[FW_T1_LB]->set(clbt1, clbt1ev, 0, false);
 
   // Nach Liebenzell von Gleis 2
-  fahrwege[FW_T2_LB]->set(clbt2, clbt2ev, false);
+  fahrwege[FW_T2_LB]->set(clbt2, clbt2ev, 1, false);
 
   // Nach Liebenzell von Gleis 3
-  fahrwege[FW_T3_LB]->set(clbt3, clbt3ev, false);
+  fahrwege[FW_T3_LB]->set(clbt3, clbt3ev, 2, false);
 
   // Nach Liebenzell von Gleis 4
-  fahrwege[FW_T4_LB]->set(clbt4, clbt4ev, false);
+  fahrwege[FW_T4_LB]->set(clbt4, clbt4ev, 3, false);
 
   // Nach Althengstett von Gleis 2
-  fahrwege[FW_T2_AH]->set(caht2, caht2ev, false);
+  fahrwege[FW_T2_AH]->set(caht2, caht2ev, 1, false);
 
   // Nach Althengstett von Gleis 3
-  fahrwege[FW_T3_AH]->set(caht3, caht3ev, false);
+  fahrwege[FW_T3_AH]->set(caht3, caht3ev, 2,false);
 
   // Nach Althengstett von Gleis 4
-  fahrwege[FW_T4_AH]->set(caht4, caht4ev, false);
+  fahrwege[FW_T4_AH]->set(caht4, caht4ev, 3, false);
 
  }
 
@@ -310,7 +317,7 @@ void World::processCommand(uint8_t cmd) {
     case 1:
       // Signalhebel
       for (int i = 0; i < 4; i++) {
-        setSignal((pk << 2) + i, !(cmd & (1 << (i & 0xf))));
+        setSignal((pk << 2) + i, !(cmd & (8 >> i)));
       }
 
       break;
@@ -360,11 +367,27 @@ void World::checkStartTrain(uint8_t source) {
  **/
 void World::updateStreckenblock(uint8_t source) {
   for (uint8_t i = 0; i < 3; i++) {
-    if ((source & 1) != m_streckeIsRemote[i]) {
-      Serial.print("Switch block "); Serial.print(i); Serial.print(" to "); Serial.println(source & 1);
+    if (!(source & 1) != m_streckeIsRemote[i]) {
+      Serial.print("Switch block "); Serial.print(i); Serial.print(" to "); Serial.println(!(source & 1));
     }
-    m_streckeIsRemote[i] = source & 1;
+
+    m_streckeIsRemote[i] = !(source & 1);
     source >>= 1;
+  }
+
+  for (uint8_t fwn = 0; fwn <= 3; fwn++) {
+    Fahrweg* fw = fahrwege[fwn];
+    fw->setBlock(m_streckeIsRemote[0]);
+  }
+
+  for (uint8_t fwn = 4; fwn <= 6; fwn++) {
+    Fahrweg* fw = fahrwege[fwn];
+    fw->setBlock(m_streckeIsRemote[1]);
+  }
+
+  for (uint8_t fwn = 7; fwn <= 9; fwn++) {
+    Fahrweg* fw = fahrwege[fwn];
+    fw->setBlock(m_streckeIsRemote[2]);
   }
 }
 
@@ -372,15 +395,15 @@ void World::startTrain(uint8_t source) {
   switch (source) {
     case 0:
       m_fromLB = fahrwege[FW_LB_EFS];
-      m_fromLB->show();
+      m_fromLB->show(NULL);
       break;
     case 1:
       m_fromAH = fahrwege[FW_AH_EFS];
-      m_fromAH->show();
+      m_fromAH->show(NULL);
       break;
     case 2:
       m_fromWB = fahrwege[FW_WB_EFS];
-      m_fromWB->show();
+      m_fromWB->show(NULL);
       break;
   }
 }
@@ -388,7 +411,7 @@ void World::startTrain(uint8_t source) {
 void World::changeFW(uint8_t fwNum, bool setClear) {
   if (fahrwege[fwNum]->isShown() != setClear) {
     if (setClear) {
-      fahrwege[fwNum]->show();
+      fahrwege[fwNum]->show(NULL);
     } else {
       fahrwege[fwNum]->clear();
     }
@@ -400,17 +423,25 @@ void World::setFahrstrasse(uint8_t source) {
   uint8_t baseValue = (((source >> 4) & 0xf) - 4) << 2;
   for (uint8_t mask = 8, offset = 0; mask > 0; mask >>= 1, offset++) {
     uint8_t fsNum = baseValue + offset;
+    Train *sourceTrain = NULL;
     if (bits & mask) {
       if (fsNum <= FW_LB_T4 ) {
+        sourceTrain = fahrwege[FW_LB_EFS]->getTrain();
         changeFW(FW_LB_EFS, false);
       } else if (fsNum <= FW_AH_T4 ) {
+        sourceTrain = fahrwege[FW_AH_EFS]->getTrain();
         changeFW(FW_AH_EFS, false);
       } else if (fsNum <= FW_WB_T4 ) {
+        sourceTrain = fahrwege[FW_WB_EFS]->getTrain();
         changeFW(FW_WB_EFS, false);
       }
       if (!fahrwege[fsNum]->isShown()) {
         Serial.print("show fw: "); Serial.println(fsNum);
-        fahrwege[fsNum]->show();
+        fahrwege[fsNum]->show(sourceTrain);
+        if (sourceTrain) {
+          m_fromLB->done();
+          m_fromLB = fahrwege[fsNum];
+        }
       }     
     } else {
       if (fahrwege[fsNum]->isShown()) {
@@ -437,6 +468,20 @@ void World::process(unsigned long now) {
 
   if (m_fromLB && !m_fromLB->done()) {
     m_fromLB->advance(false);
+  } else {
+    m_fromLB = NULL;
+  }
+
+  if (m_fromAH && !m_fromAH->done()) {
+    m_fromAH->advance(false);
+  } else {
+    m_fromAH = NULL;
+  }
+
+  if (m_fromWB && !m_fromWB->done()) {
+    m_fromWB->advance(false);
+  } else {
+    m_fromWB = NULL;
   }
 
   lastStep = now + 100;
@@ -461,14 +506,14 @@ void World::test(unsigned long now) {
         activeFW = 0;
       }
       Serial.print("Show Fahrstrasse "); Serial.println(testList[activeFW]);
-      fahrwege[testList[activeFW]]->show();
+      fahrwege[testList[activeFW]]->show(NULL);
       Serial.println("Show done.");
     }
   }
 
   if (activeFW < 0) {
     activeFW = 0;
-    fahrwege[testList[activeFW]]->show();
+    fahrwege[testList[activeFW]]->show(NULL);
   }
 
   //Serial.println("Advance");

@@ -10,14 +10,17 @@ class Fahrweg {
   public:
     static void setSignals(Signal* signals);
     Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor);
-    void set(short* fahrwegItems, unsigned long* eventList, boolean isInbound);
-    void show();
+    void set(short* fahrwegItems, unsigned long* eventList, uint8_t track, boolean isInbound);
+    void show(Train* train);
     void start();
     void advance(bool testMode);
     bool done();
     void clear();
     void setBlock(bool isRemote);
     bool isShown();
+    Train* getTrain();
+    void setTrains(Train **trackTrains);
+    uint8_t getTrack();
 
   private:
     short* m_fahrwegItems;
@@ -30,6 +33,8 @@ class Fahrweg {
     bool m_shown;
     AsyncTimer* m_timer;
     bool m_sectionBlockIsRemote;
+    Train **m_trackTrains;
+    uint8_t m_track;
 };
 
 #endif

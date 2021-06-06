@@ -12,7 +12,7 @@
 
 #define NUM_LEDS 580
 #define NUM_SIGNALS 16
-#define NUM_FAHRWEGE 24
+#define NUM_FAHRWEGE 23
 #define LED_PIN     5
 
 #define FW_LB_EFS 20
@@ -60,6 +60,7 @@ class World {
     Fahrweg *m_fromLB = NULL;
     Fahrweg *m_fromAH = NULL;
     Fahrweg *m_fromWB = NULL;
+    Train *m_trackTrain[4] = {NULL, NULL, NULL, NULL};
     bool m_streckeIsRemote[3];
 
     void initSignals();

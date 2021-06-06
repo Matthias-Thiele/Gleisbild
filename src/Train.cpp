@@ -26,6 +26,16 @@ void Train::advance(short toPosition) {
   }
 }
 
+short* Train::getPositions() {
+  return m_positions;
+}
+
+void Train::setPositions(short* pos) {
+  for (uint8_t i = 0; i < TRAIN_LENGTH; i++) {
+    m_positions[i] = *pos++;
+  }
+}
+
 void Train::redraw() {
   for (int i = 0; i < TRAIN_LENGTH; i++) {
     int toPosition = m_positions[i];

@@ -15,6 +15,10 @@ void Fahrweg::setSignals(Signal* signals) {
   g_signals = signals;
 }
 
+void Fahrweg::setTrains(Train **trackTrains) {
+  m_trackTrains = trackTrains;
+}
+
 Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor) {
   m_train.init(leds, trainColor, trackColor);
   m_leds = leds;
@@ -22,6 +26,7 @@ Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor) {
   m_timer = NULL;
   m_fahrwegItems = NULL;
   m_shown = false;
+  m_sectionBlockIsRemote = false;
 }
 
 void Fahrweg::clear() {
@@ -43,6 +48,10 @@ void Fahrweg::clear() {
     }
   }
 
+  if (m_isInbound) {
+    m_train.redraw();
+  }
+
   ledsChanged = true;
   m_shown = false;
 }
@@ -51,7 +60,7 @@ bool Fahrweg::isShown() {
   return m_shown;
 }
 
-void Fahrweg::show() {
+void Fahrweg::show(Train* train) {
   m_fwi.setFahrwegList(m_fahrwegItems);
 
   while (m_fwi.hasMore()) {
@@ -63,12 +72,36 @@ void Fahrweg::show() {
   m_shown = true;
 
   m_fwi.setFahrwegList(m_fahrwegItems);
+
+  if (train) {
+    bool found = false;
+    short tpos = train->getPositions()[TRAIN_LENGTH - 1];
+    Serial.print("look for pos "); Serial.print(tpos);
+    while (m_fwi.hasMore()) {
+      int pos = m_fwi.peekPos();
+      if (pos == tpos) {
+        Serial.print(", found ");
+        m_train.setPositions(train->getPositions());
+        found = true;
+        break;
+      } else {
+        m_fwi.nextPos();
+      }
+    }
+
+    if (!found) {
+      Serial.print("reset ");
+      m_fwi.setFahrwegList(m_fahrwegItems);
+    }
+  }
+  Serial.println("done.");
 }
 
-void Fahrweg::set(short* fahrwegItems, unsigned long* eventList, boolean isInbound) {
+void Fahrweg::set(short* fahrwegItems, unsigned long* eventList, uint8_t track, boolean isInbound) {
   m_fahrwegItems = fahrwegItems;
   m_eventList = eventList;
   m_isInbound = isInbound;
+  m_track = track;
 
   m_fwi.setFahrwegList(fahrwegItems);
 }
@@ -78,7 +111,18 @@ void Fahrweg::start() {
 }
 
 void Fahrweg::setBlock(bool isRemote) {
+  if (m_sectionBlockIsRemote != isRemote) {
+    Serial.print("section block of track "); Serial.print(m_track); Serial.print(" set to "); Serial.print(isRemote);Serial.print(", was "); Serial.println(m_sectionBlockIsRemote);
+  }
   m_sectionBlockIsRemote = isRemote;
+}
+
+Train* Fahrweg::getTrain() {
+  return &m_train;
+}
+
+uint8_t Fahrweg::getTrack() {
+  return m_track;
 }
 
 void Fahrweg::advance(bool testMode) {
@@ -91,44 +135,60 @@ void Fahrweg::advance(bool testMode) {
     unsigned long* evp = m_eventList;
     while (unsigned long ev = *evp++) {
       if (((short)(ev & 0xffful)) == pos) {
-      int sig = (ev >> 12) & 0xff;
-      bool isRemote = sig & BLOCK_IS_REMOTE;
-      //Serial.print("now at pos "); Serial.print(pos);
-      //Serial.print(", Signal "); Serial.println(sig);
-      //Serial.print(", Event "); Serial.println(ev >> 20);
-        switch (ev & 0xf00000) {
+        int sig = (ev >> 12) & 0xff;
+        bool isRemote = sig & BLOCK_IS_REMOTE;
+        bool onlyTest = ev & ONLY_TEST;
+        switch (ev & 0xff00000) {
           case WAIT_FOR_BLOCK:
+        Serial.print("now at pos "); Serial.print(pos);
+        Serial.print(", Signal "); Serial.println(sig);
+        Serial.print(", Remote "); Serial.println(isRemote);
+        Serial.print(", Section "); Serial.println(m_sectionBlockIsRemote);
+        Serial.print(", Event "); Serial.println(ev >> 20, HEX);
             if (!testMode && (m_sectionBlockIsRemote != isRemote)) {
               Serial.println("Wait for section block.");
               return;
             }
+            break;
 
           case SET_SIGNAL:
-            g_signals[sig].set();
-            Serial.print(" Set signal "); Serial.println(sig);
+            if (onlyTest && testMode) {
+              g_signals[sig].set();
+              Serial.print(" Set signal "); Serial.println(sig);
+            }
             break;
         
           case RESET_SIGNAL:
-            g_signals[sig].release();
-            Serial.print(" Reset signal "); Serial.println(sig);
+            if (onlyTest && testMode) {
+              g_signals[sig].release();
+              Serial.print(" Reset signal "); Serial.println(sig);
+            }
             break;
         
           case STOP_TRAIN:
             Serial.println("Train stopped");
-            m_shown = false;
-            Serial.println("Clear 1");
-            clear();
-            if (m_isInbound) {
-              m_train.redraw();
-              Serial.println("Redraw");
+            if (testMode) {
+              m_shown = false;
+              Serial.println("Clear 1");
+              clear();
+              if (m_isInbound) {
+                m_train.redraw();
+                Serial.println("Redraw");
+              }
+              ledsChanged = true;
             }
-            ledsChanged = true;
             return;
 
           case WAIT_FOR_SIGNAL:
             if (!testMode && !g_signals[sig].isSet()) {
               //Serial.print(" Wait for signal "); Serial.println(sig);
               return;
+            }
+            break;
+
+          case TRACK:
+            if (m_track != 0xff) {
+              m_trackTrains[m_track] = &m_train;
             }
             break;
         }
@@ -142,6 +202,9 @@ void Fahrweg::advance(bool testMode) {
     m_shown = false;
     Serial.println("Clear 2");
     clear();
+    if (m_isInbound) {
+      m_train.redraw();
+    }
     ledsChanged = true;
   }
 }
