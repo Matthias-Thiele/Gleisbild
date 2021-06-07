@@ -28,9 +28,6 @@
 #define FW_WB_T1 7
 #define FW_WB_T2 8
 #define FW_WB_T4 9
-#define FW_T1_WB 17
-#define FW_T2_WB 18
-#define FW_T4_WB 19
 #define FW_T1_LB 10
 #define FW_T2_LB 11
 #define FW_T3_LB 12
@@ -38,6 +35,9 @@
 #define FW_T2_AH 14
 #define FW_T3_AH 15
 #define FW_T4_AH 16
+#define FW_T1_WB 17
+#define FW_T2_WB 18
+#define FW_T4_WB 19
 
 
 class World {
@@ -60,7 +60,6 @@ class World {
     Fahrweg *m_fromLB = NULL;
     Fahrweg *m_fromAH = NULL;
     Fahrweg *m_fromWB = NULL;
-    Train *m_trackTrain[4] = {NULL, NULL, NULL, NULL};
     bool m_streckeIsRemote[3];
 
     void initSignals();

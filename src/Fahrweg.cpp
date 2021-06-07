@@ -6,10 +6,10 @@ extern bool ledsChanged;
 Signal* g_signals;
 bool g_isTestMode;
 
-static void trainHandler(AsyncTimer *timer, unsigned long now, void* source) {
-  Fahrweg* fw = (Fahrweg*)source;
-  fw->advance(g_isTestMode);
-}
+//static void trainHandler(AsyncTimer *timer, unsigned long now, void* source) {
+//  Fahrweg* fw = (Fahrweg*)source;
+//  fw->advance(g_isTestMode);
+//}
 
 void Fahrweg::setSignals(Signal* signals) {
   g_signals = signals;
@@ -61,6 +61,7 @@ bool Fahrweg::isShown() {
 }
 
 void Fahrweg::show(Train* train) {
+  Serial.print("Show fw "); Serial.println((long) train, HEX);
   m_fwi.setFahrwegList(m_fahrwegItems);
 
   while (m_fwi.hasMore()) {
@@ -106,9 +107,9 @@ void Fahrweg::set(short* fahrwegItems, unsigned long* eventList, uint8_t track, 
   m_fwi.setFahrwegList(fahrwegItems);
 }
 
-void Fahrweg::start() {
-  m_timer = AsyncTimer::add(50, -1, this, trainHandler);
-}
+//void Fahrweg::start() {
+//  m_timer = AsyncTimer::add(50, -1, this, trainHandler);
+//}
 
 void Fahrweg::setBlock(bool isRemote) {
   if (m_sectionBlockIsRemote != isRemote) {
@@ -138,11 +139,12 @@ void Fahrweg::advance(bool testMode) {
         int sig = (ev >> 12) & 0xff;
         bool isRemote = sig & BLOCK_IS_REMOTE;
         bool onlyTest = ev & ONLY_TEST;
-        /* Serial.print("now at pos "); Serial.print(pos);
+        Serial.print("now at pos "); Serial.print(pos);
+        Serial.print(", Test "); Serial.print(testMode);
         Serial.print(", Signal "); Serial.print(sig);
-        Serial.print(", Remote "); Serial.println(isRemote);
-        Serial.print(", Section "); Serial.println(m_sectionBlockIsRemote);
-        Serial.print(", Event "); Serial.println(ev >> 20, HEX); */
+        Serial.print(", Remote "); Serial.print(isRemote);
+        Serial.print(", Section "); Serial.print(m_sectionBlockIsRemote);
+        Serial.print(", Event "); Serial.println(ev >> 20, HEX); 
         switch (ev & 0xff00000) {
           case WAIT_FOR_BLOCK:
             if (!testMode && (m_sectionBlockIsRemote != isRemote)) {

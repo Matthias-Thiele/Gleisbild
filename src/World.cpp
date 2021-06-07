@@ -57,6 +57,7 @@ unsigned long ahefsev[] = {
 
 short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
 unsigned long aht234ev[] = {
+  WAIT_FOR_BLOCK | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
   WAIT_FOR_SIGNAL | (1ul << 12) | 212ul,

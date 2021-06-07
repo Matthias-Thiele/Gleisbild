@@ -19,4 +19,4 @@
 #define TRACK_4 3
 
 
-#define ONLY_TEST 0x8000000ul
+#define ONLY_TEST 0x10000000ul
