@@ -16,7 +16,7 @@ int testList[] = {FW_AH_T3, FW_WB_T2, FW_LB_T4, FW_T3_LB, FW_T2_AH, FW_LB_T1, FW
 short lbefs[] = {315, 385, -1};
 unsigned long lbefsev[] = {
   WAIT_FOR_BLOCK | BLOCK_LB | BLOCK_IS_REMOTE | 319ul,
-  SET_SIGNAL | (11ul << 12) | 319ul,
+  SET_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
   WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
   0
@@ -28,13 +28,16 @@ unsigned long lbt1234ev[] = {
   SET_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
   WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
-  TRACK | TRACK_ALLOCATE | 384ul,
   SET_SIGNAL | (0ul << 12) | 370ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 190ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 56ul | ONLY_TEST,
+  TRACK | TRACK_ALLOCATE | 164ul,
   STOP_TRAIN | 164ul,
+  TRACK | TRACK_ALLOCATE | 94ul,
   STOP_TRAIN | 94ul,
+  TRACK | TRACK_ALLOCATE | 7ul,
   STOP_TRAIN | 7ul,
+  TRACK | TRACK_ALLOCATE | 441ul,
   STOP_TRAIN | 441ul,
   0
 };
@@ -57,11 +60,13 @@ unsigned long aht234ev[] = {
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
   WAIT_FOR_SIGNAL | (1ul << 12) | 212ul,
-  TRACK | TRACK_ALLOCATE | 211ul,
   SET_SIGNAL | (1ul << 12) | 220ul | ONLY_TEST,
   RESET_SIGNAL | (1ul << 12) | 392ul | ONLY_TEST,
+  TRACK | TRACK_ALLOCATE | 94ul,
   STOP_TRAIN | 94ul,
+  TRACK | TRACK_ALLOCATE | 7ul,
   STOP_TRAIN | 7ul,
+  TRACK | TRACK_ALLOCATE | 441ul,
   STOP_TRAIN | 441ul,
   0
 };
@@ -71,6 +76,7 @@ short aht4[] = {280, 206, 391, 393, 403, 450, -1};
 // Einfahrt von Wildberg
 short wbefs[] = {544, 558, 529, 473, -1};
 unsigned long wbefsev[] = {
+  WAIT_FOR_BLOCK | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
   SET_SIGNAL | (15ul << 12) | 544ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
   WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
@@ -79,16 +85,19 @@ unsigned long wbefsev[] = {
 
 short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
 unsigned long wbt124ev[] = {
+  WAIT_FOR_BLOCK | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
   SET_SIGNAL | (15ul << 12) | 544ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
   WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
-  TRACK | TRACK_ALLOCATE | 469ul,
   SET_SIGNAL | (2ul << 12) | 490ul | ONLY_TEST,
   RESET_SIGNAL | (2ul << 12) | 140ul | ONLY_TEST,
   RESET_SIGNAL | (2ul << 12) | 110ul | ONLY_TEST,
   RESET_SIGNAL | (2ul << 12) | 470ul | ONLY_TEST,
+  TRACK | TRACK_ALLOCATE | 170ul,
   STOP_TRAIN | 170ul,
+  TRACK | TRACK_ALLOCATE | 88ul,
   STOP_TRAIN | 88ul,
+  TRACK | TRACK_ALLOCATE | 435ul,
   STOP_TRAIN | 435,
   0
 };
@@ -375,19 +384,19 @@ void World::updateStreckenblock(uint8_t source) {
     source >>= 1;
   }
 
-  for (uint8_t fwn = 0; fwn <= 3; fwn++) {
-    Fahrweg* fw = fahrwege[fwn];
-    fw->setBlock(m_streckeIsRemote[0]);
+  fahrwege[FW_LB_EFS]->setBlock(m_streckeIsRemote[0]);
+  for (uint8_t fwn = FW_LB_T1; fwn <= FW_LB_T4; fwn++) {
+    fahrwege[fwn]->setBlock(m_streckeIsRemote[0]);
   }
 
-  for (uint8_t fwn = 4; fwn <= 6; fwn++) {
-    Fahrweg* fw = fahrwege[fwn];
-    fw->setBlock(m_streckeIsRemote[1]);
+  fahrwege[FW_AH_EFS]->setBlock(m_streckeIsRemote[1]);
+  for (uint8_t fwn = FW_AH_T2; fwn <= FW_AH_T4; fwn++) {
+    fahrwege[fwn]->setBlock(m_streckeIsRemote[1]);
   }
 
-  for (uint8_t fwn = 7; fwn <= 9; fwn++) {
-    Fahrweg* fw = fahrwege[fwn];
-    fw->setBlock(m_streckeIsRemote[2]);
+  fahrwege[FW_WB_EFS]->setBlock(m_streckeIsRemote[2]);
+  for (uint8_t fwn = FW_WB_T1; fwn <= FW_WB_T4; fwn++) {
+    fahrwege[fwn]->setBlock(m_streckeIsRemote[2]);
   }
 }
 
@@ -435,17 +444,26 @@ void World::setFahrstrasse(uint8_t source) {
         sourceTrain = fahrwege[FW_WB_EFS]->getTrain();
         changeFW(FW_WB_EFS, false);
       }
+
       if (!fahrwege[fsNum]->isShown()) {
-        Serial.print("show fw: "); Serial.println(fsNum);
+        Serial.print("Show fw: "); Serial.println(fsNum);
         fahrwege[fsNum]->show(sourceTrain);
         if (sourceTrain) {
-          m_fromLB->done();
-          m_fromLB = fahrwege[fsNum];
+          if (fsNum <= FW_LB_T4 ) {
+            m_fromLB->done();
+            m_fromLB = fahrwege[fsNum];
+          } else if (fsNum <= FW_AH_T4 ) {
+            m_fromAH->done();
+            m_fromAH = fahrwege[fsNum];
+          } else if (fsNum <= FW_WB_T4 ) {
+            m_fromWB->done();
+            m_fromWB = fahrwege[fsNum];
+          }
         }
       }     
     } else {
       if (fahrwege[fsNum]->isShown()) {
-        Serial.print("clear fw: "); Serial.println(fsNum);
+        Serial.print("Clear fw: "); Serial.println(fsNum);
         fahrwege[fsNum]->clear();
       }
     }

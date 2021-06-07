@@ -138,13 +138,13 @@ void Fahrweg::advance(bool testMode) {
         int sig = (ev >> 12) & 0xff;
         bool isRemote = sig & BLOCK_IS_REMOTE;
         bool onlyTest = ev & ONLY_TEST;
-        switch (ev & 0xff00000) {
-          case WAIT_FOR_BLOCK:
-        Serial.print("now at pos "); Serial.print(pos);
-        Serial.print(", Signal "); Serial.println(sig);
+        /* Serial.print("now at pos "); Serial.print(pos);
+        Serial.print(", Signal "); Serial.print(sig);
         Serial.print(", Remote "); Serial.println(isRemote);
         Serial.print(", Section "); Serial.println(m_sectionBlockIsRemote);
-        Serial.print(", Event "); Serial.println(ev >> 20, HEX);
+        Serial.print(", Event "); Serial.println(ev >> 20, HEX); */
+        switch (ev & 0xff00000) {
+          case WAIT_FOR_BLOCK:
             if (!testMode && (m_sectionBlockIsRemote != isRemote)) {
               Serial.println("Wait for section block.");
               return;
@@ -152,14 +152,14 @@ void Fahrweg::advance(bool testMode) {
             break;
 
           case SET_SIGNAL:
-            if (onlyTest && testMode) {
+            if (!onlyTest || testMode) {
               g_signals[sig].set();
               Serial.print(" Set signal "); Serial.println(sig);
             }
             break;
         
           case RESET_SIGNAL:
-            if (onlyTest && testMode) {
+            if (!onlyTest || testMode) {
               g_signals[sig].release();
               Serial.print(" Reset signal "); Serial.println(sig);
             }
@@ -188,7 +188,20 @@ void Fahrweg::advance(bool testMode) {
 
           case TRACK:
             if (m_track != 0xff) {
-              m_trackTrains[m_track] = &m_train;
+              if (ev & TRACK_ALLOCATE) {
+                if (!m_trackTrains[m_track]) {
+                  Serial.print("Track allocated "); Serial.println(m_track);
+                }
+
+                m_trackTrains[m_track] = &m_train;
+              }
+              if (ev & TRACK_RELEASE) {
+                if (m_trackTrains[m_track]) {
+                  Serial.print("Track released "); Serial.println(m_track);
+                }
+
+                m_trackTrains[m_track] = NULL;
+              }
             }
             break;
         }
