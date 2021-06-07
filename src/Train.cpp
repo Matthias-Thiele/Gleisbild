@@ -4,7 +4,10 @@ void Train::init(CRGB* leds, CRGB trainColor, CRGB trackColor) {
   m_leds = leds;
   m_trackColor = trackColor;
   m_trainColor = trainColor;
+  clear();
+}
 
+void Train::clear() {
   for (int i = 0; i < TRAIN_LENGTH; i++) {
     m_positions[i] = -1;
   }

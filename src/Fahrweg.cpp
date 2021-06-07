@@ -27,10 +27,12 @@ Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor) {
   m_fahrwegItems = NULL;
   m_shown = false;
   m_sectionBlockIsRemote = false;
+  m_trainRunning = false;
 }
 
 void Fahrweg::clear() {
   Serial.println("Clear fahrweg");
+  m_trainRunning = false;
   if (!m_fahrwegItems) {
     return;
   }
@@ -78,21 +80,25 @@ void Fahrweg::show(Train* train) {
     bool found = false;
     short tpos = train->getPositions()[TRAIN_LENGTH - 1];
     Serial.print("look for pos "); Serial.print(tpos);
-    while (m_fwi.hasMore()) {
-      int pos = m_fwi.peekPos();
-      if (pos == tpos) {
-        Serial.print(", found ");
-        m_train.setPositions(train->getPositions());
-        found = true;
-        break;
-      } else {
-        m_fwi.nextPos();
+    if (tpos >= 0) {
+      while (m_fwi.hasMore()) {
+        int pos = m_fwi.peekPos();
+        if (pos == tpos) {
+          Serial.print(", found ");
+          m_train.setPositions(train->getPositions());
+          found = true;
+          break;
+        } else {
+          m_fwi.nextPos();
+        }
       }
-    }
 
-    if (!found) {
-      Serial.print("reset ");
-      m_fwi.setFahrwegList(m_fahrwegItems);
+      if (!found) {
+        Serial.print("reset ");
+        m_fwi.setFahrwegList(m_fahrwegItems);
+      }
+
+      start();
     }
   }
   Serial.println("done.");
@@ -107,9 +113,14 @@ void Fahrweg::set(short* fahrwegItems, unsigned long* eventList, uint8_t track, 
   m_fwi.setFahrwegList(fahrwegItems);
 }
 
-//void Fahrweg::start() {
-//  m_timer = AsyncTimer::add(50, -1, this, trainHandler);
-//}
+void Fahrweg::start() {
+  m_trainRunning = true;
+}
+
+void Fahrweg::stop() {
+  m_trainRunning = false;
+  m_train.clear();
+}
 
 void Fahrweg::setBlock(bool isRemote) {
   if (m_sectionBlockIsRemote != isRemote) {
@@ -128,6 +139,10 @@ uint8_t Fahrweg::getTrack() {
 
 void Fahrweg::advance(bool testMode) {
   g_isTestMode = testMode;
+  if (!testMode && !m_trainRunning) {
+    return;
+  }
+
   if (m_fwi.hasMore() || (!m_isInbound && !m_train.isEmpty())) {
   //if (m_fwi.hasMore()) {
     short pos = m_fwi.peekPos();
@@ -139,12 +154,12 @@ void Fahrweg::advance(bool testMode) {
         int sig = (ev >> 12) & 0xff;
         bool isRemote = sig & BLOCK_IS_REMOTE;
         bool onlyTest = ev & ONLY_TEST;
-        Serial.print("now at pos "); Serial.print(pos);
+        /*Serial.print("now at pos "); Serial.print(pos);
         Serial.print(", Test "); Serial.print(testMode);
         Serial.print(", Signal "); Serial.print(sig);
         Serial.print(", Remote "); Serial.print(isRemote);
         Serial.print(", Section "); Serial.print(m_sectionBlockIsRemote);
-        Serial.print(", Event "); Serial.println(ev >> 20, HEX); 
+        Serial.print(", Event "); Serial.println(ev >> 20, HEX); */
         switch (ev & 0xff00000) {
           case WAIT_FOR_BLOCK:
             if (!testMode && (m_sectionBlockIsRemote != isRemote)) {

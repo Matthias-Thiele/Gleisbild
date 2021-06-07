@@ -12,6 +12,7 @@ class Train {
     void redraw();
     short* getPositions();
     void setPositions(short* pos);
+    void clear();
     
   private:
     CRGB* m_leds;

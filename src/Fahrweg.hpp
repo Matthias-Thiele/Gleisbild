@@ -13,6 +13,7 @@ class Fahrweg {
     void set(short* fahrwegItems, unsigned long* eventList, uint8_t track, boolean isInbound);
     void show(Train* train);
     void start();
+    void stop();
     void advance(bool testMode);
     bool done();
     void clear();
@@ -35,6 +36,7 @@ class Fahrweg {
     bool m_sectionBlockIsRemote;
     Train **m_trackTrains;
     uint8_t m_track;
+    bool m_trainRunning;
 };
 
 #endif

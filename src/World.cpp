@@ -406,24 +406,30 @@ void World::startTrain(uint8_t source) {
     case 0:
       m_fromLB = fahrwege[FW_LB_EFS];
       m_fromLB->show(NULL);
+      m_fromLB->start();
       break;
     case 1:
-      m_fromAH = fahrwege[FW_AH_EFS];
-      m_fromAH->show(NULL);
+      if (!m_fromAH) {
+        m_fromAH = fahrwege[FW_AH_EFS];
+        m_fromAH->show(NULL);
+      }
+      m_fromAH->start();
       break;
     case 2:
       m_fromWB = fahrwege[FW_WB_EFS];
       m_fromWB->show(NULL);
+      m_fromWB->start();
       break;
   }
 }
 
 void World::changeFW(uint8_t fwNum, bool setClear) {
-  if (fahrwege[fwNum]->isShown() != setClear) {
+  Fahrweg *fw = fahrwege[fwNum];
+  if (fw->isShown() != setClear) {
     if (setClear) {
-      fahrwege[fwNum]->show(NULL);
+      fw->show(NULL);
     } else {
-      fahrwege[fwNum]->clear();
+      fw->clear();
     }
   }
 }
@@ -435,14 +441,18 @@ void World::setFahrstrasse(uint8_t source) {
     uint8_t fsNum = baseValue + offset;
     Train *sourceTrain = NULL;
     if (bits & mask) {
+      Fahrweg *sourceFW = NULL;
       if (fsNum <= FW_LB_T4 ) {
         sourceTrain = fahrwege[FW_LB_EFS]->getTrain();
+        sourceFW = fahrwege[FW_LB_EFS];
         changeFW(FW_LB_EFS, false);
       } else if (fsNum <= FW_AH_T4 ) {
         sourceTrain = fahrwege[FW_AH_EFS]->getTrain();
+        sourceFW = fahrwege[FW_AH_EFS];
         changeFW(FW_AH_EFS, false);
       } else if (fsNum <= FW_WB_T4 ) {
         sourceTrain = fahrwege[FW_WB_EFS]->getTrain();
+        sourceFW = fahrwege[FW_WB_EFS];
         changeFW(FW_WB_EFS, false);
       }
 
@@ -461,6 +471,10 @@ void World::setFahrstrasse(uint8_t source) {
             m_fromWB = fahrwege[fsNum];
           }
         }
+      }
+
+      if (sourceFW) {
+        sourceFW->stop();
       }     
     } else {
       if (fahrwege[fsNum]->isShown()) {
