@@ -15,7 +15,7 @@ void Fahrweg::setSignals(Signal* signals) {
   g_signals = signals;
 }
 
-void Fahrweg::setTrains(Train **trackTrains) {
+void Fahrweg::setTrains(Train *trackTrains) {
   m_trackTrains = trackTrains;
 }
 
@@ -100,7 +100,16 @@ void Fahrweg::show(Train* train) {
 
       start();
     }
+  } else {
+    Serial.print("Track: "); Serial.print(m_track); Serial.print(", isEmpty: "); Serial.println(m_trackTrains[m_track].isEmpty());
+    if (!m_isInbound && !m_trackTrains[m_track].isEmpty()) {
+      m_train.setPositions(m_trackTrains[m_track].getPositions());
+      m_train.redraw();
+      Serial.println("Start train");
+      start();
+    }
   }
+
   Serial.println("done.");
 }
 
@@ -171,14 +180,14 @@ void Fahrweg::advance(bool testMode) {
           case SET_SIGNAL:
             if (!onlyTest || testMode) {
               g_signals[sig].set();
-              Serial.print(" Set signal "); Serial.println(sig);
+              Serial.print(" Set signal "); Serial.print(sig); Serial.print(" at pos "); Serial.println(pos);
             }
             break;
         
           case RESET_SIGNAL:
             if (!onlyTest || testMode) {
               g_signals[sig].release();
-              Serial.print(" Reset signal "); Serial.println(sig);
+              Serial.print(" Reset signal "); Serial.print(sig); Serial.print(" at pos "); Serial.println(pos);
             }
             break;
         
@@ -206,18 +215,18 @@ void Fahrweg::advance(bool testMode) {
           case TRACK:
             if (m_track != 0xff) {
               if (ev & TRACK_ALLOCATE) {
-                if (!m_trackTrains[m_track]) {
+                if (m_trackTrains[m_track].isEmpty()) {
                   Serial.print("Track allocated "); Serial.println(m_track);
                 }
 
-                m_trackTrains[m_track] = &m_train;
+                m_trackTrains[m_track].setPositions(m_train.getPositions());
               }
               if (ev & TRACK_RELEASE) {
-                if (m_trackTrains[m_track]) {
+                if (!m_trackTrains[m_track].isEmpty()) {
                   Serial.print("Track released "); Serial.println(m_track);
                 }
 
-                m_trackTrains[m_track] = NULL;
+                m_trackTrains[m_track].clear();
               }
             }
             break;
@@ -229,13 +238,15 @@ void Fahrweg::advance(bool testMode) {
     m_train.advance(pos);
     ledsChanged = true;
   } else {
-    m_shown = false;
-    Serial.println("Clear 2");
-    clear();
-    if (m_isInbound) {
-      m_train.redraw();
+    if (testMode) {
+      m_shown = false;
+      Serial.println("Clear 2");
+      clear();
+      if (m_isInbound) {
+        m_train.redraw();
+      }
+      ledsChanged = true;
     }
-    ledsChanged = true;
   }
 }
 

@@ -108,8 +108,8 @@ short wbt4[] = {544, 558, 529, 469, 130, 125, 122, 119, 467, 425, -1};
 // Ausfahrt nach Wildberg
 short cwbt1[] = {169, 130, 469, 543, -1};
 unsigned long cwbt1ev[] = {
-  SET_SIGNAL | (7ul << 12) | 166ul,
-  RESET_SIGNAL | (7ul << 12) | 135ul,
+  SET_SIGNAL | (7ul << 12) | 166ul | ONLY_TEST,
+  RESET_SIGNAL | (7ul << 12) | 135ul | ONLY_TEST,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 540ul,
   0
@@ -117,8 +117,8 @@ unsigned long cwbt1ev[] = {
 
 short cwbt2[] = {89, 122, 125, 129, 130, 130, 469, 543, -1};
 unsigned long cwbt2ev[] = {
-  SET_SIGNAL | (8ul << 12) | 91ul,
-  RESET_SIGNAL | (8ul << 12) | 129ul,
+  SET_SIGNAL | (8ul << 12) | 91ul | ONLY_TEST,
+  RESET_SIGNAL | (8ul << 12) | 129ul | ONLY_TEST,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 540ul,
   0
@@ -126,8 +126,8 @@ unsigned long cwbt2ev[] = {
 
 short cwbt4[] = {436, 467, 119, 122, 125, 129, 130, 130, 469, 543, -1};
 unsigned long cwbt4ev[] = {
-  SET_SIGNAL | (9ul << 12) | 439ul,
-  RESET_SIGNAL | (9ul << 12) | 460ul,
+  SET_SIGNAL | (9ul << 12) | 439ul | ONLY_TEST,
+  RESET_SIGNAL | (9ul << 12) | 460ul | ONLY_TEST,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 540ul,
   0
@@ -136,8 +136,8 @@ unsigned long cwbt4ev[] = {
 // Ausfahrt nach Liebenzell
 short clbt1[] = {165, 204, 389, 329, 300, 314, -1};
 unsigned long clbt1ev[] = {
-  SET_SIGNAL | (3ul << 12) | 166ul,
-  RESET_SIGNAL | (3ul << 12) | 190ul,
+  SET_SIGNAL | (3ul << 12) | 166ul | ONLY_TEST,
+  RESET_SIGNAL | (3ul << 12) | 190ul | ONLY_TEST,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 305ul,
   0
@@ -145,8 +145,8 @@ unsigned long clbt1ev[] = {
 
 short clbt2[] = {93, 62, 56, 61, 203, 204, 389, 329, 300, 314, -1};
 unsigned long clbt2ev[] = {
-  SET_SIGNAL | (4ul << 12) | 88ul,
-  RESET_SIGNAL | (4ul << 12) | 60ul,
+  SET_SIGNAL | (4ul << 12) | 88ul | ONLY_TEST,
+  RESET_SIGNAL | (4ul << 12) | 60ul | ONLY_TEST,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 305ul,
   0
@@ -154,8 +154,8 @@ unsigned long clbt2ev[] = {
 
 short clbt3[] = {8, 33, 49, 61, 203, 204, 389, 329, 300, 314, -1};
 unsigned long clbt3ev[] = {
-  SET_SIGNAL | (5ul << 12) | 10ul,
-  RESET_SIGNAL | (5ul << 12) | 30ul,
+  SET_SIGNAL | (5ul << 12) | 10ul | ONLY_TEST,
+  RESET_SIGNAL | (5ul << 12) | 30ul | ONLY_TEST,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 305ul,
   0
@@ -163,8 +163,8 @@ unsigned long clbt3ev[] = {
 
 short clbt4[] = {440, 420, 43, 61, 203, 204, 389, 329, 300, 314, -1};
 unsigned long clbt4ev[] = {
-  SET_SIGNAL | (6ul << 12) | 430ul,
-  RESET_SIGNAL | (6ul << 12) | 420ul,
+  SET_SIGNAL | (6ul << 12) | 430ul | ONLY_TEST,
+  RESET_SIGNAL | (6ul << 12) | 420ul | ONLY_TEST,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 305ul,
   0
@@ -173,8 +173,10 @@ unsigned long clbt4ev[] = {
 // Ausfahrt nach Althengstett
 short caht2[] = {93, 73, 38, 42, 33, 33, 48, 49, 402, 391, 206, 266, 295, 281, -1};
 unsigned long caht2ev[] = {
-  SET_SIGNAL | (4ul << 12) | 91ul,
-  RESET_SIGNAL | (4ul << 12) | 73ul,
+  WAIT_FOR_SIGNAL | (5ul << 12) | 93ul,
+  SET_SIGNAL | (4ul << 12) | 91ul | ONLY_TEST,
+  RESET_SIGNAL | (4ul << 12) | 392ul | ONLY_TEST,
+  TRACK | TRACK_RELEASE | 392ul,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   0
@@ -182,8 +184,10 @@ unsigned long caht2ev[] = {
 
 short caht3[] = {8, 33, 48, 49, 402, 391, 206, 266, 295, 281, -1};
 unsigned long caht3ev[] = {
-  SET_SIGNAL | (5ul << 12) | 10ul,
-  RESET_SIGNAL | (5ul << 12) | 25ul,
+  WAIT_FOR_SIGNAL | (5ul << 12) | 8ul,
+  SET_SIGNAL | (5ul << 12) | 10ul | ONLY_TEST,
+  RESET_SIGNAL | (5ul << 12) | 392ul | ONLY_TEST,
+  TRACK | TRACK_RELEASE | 392ul,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   0
@@ -191,8 +195,10 @@ unsigned long caht3ev[] = {
 
 short caht4[] = {440, 403, 393, 391, 206, 266, 295, 281, -1};
 unsigned long caht4ev[] = {
-  SET_SIGNAL | (6ul << 12) | 438ul,
-  RESET_SIGNAL | (6ul << 12) | 410ul,
+  WAIT_FOR_SIGNAL | (6ul << 12) | 440ul,
+  SET_SIGNAL | (6ul << 12) | 438ul | ONLY_TEST,
+  RESET_SIGNAL | (6ul << 12) | 392ul | ONLY_TEST,
+  TRACK | TRACK_RELEASE | 392ul,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   0
@@ -242,6 +248,7 @@ void World::initFahrstrassen() {
   CRGB trackColor = {0x20, 0x20, 0x20};
   for (int i = 0; i < NUM_FAHRWEGE; i++) {
     fahrwege[i] = new Fahrweg(leds, trainColor, trackColor);
+    fahrwege[i]->setTrains(trackTrains);
   }
 
   // Liebenzell bis zum Einfahrtsignal
@@ -468,6 +475,14 @@ void World::setFahrstrasse(uint8_t source) {
             m_fromAH = fahrwege[fsNum];
           } else if (fsNum <= FW_WB_T4 ) {
             m_fromWB->done();
+            m_fromWB = fahrwege[fsNum];
+          }
+        } else {
+          if (fsNum >= FW_T1_LB && fsNum <= FW_T4_LB) {
+            m_fromLB = fahrwege[fsNum];
+          } else if (fsNum >= FW_T2_AH && fsNum <= FW_T4_AH) {
+            m_fromAH = fahrwege[fsNum];
+          } else if (fsNum >= FW_T1_WB && fsNum <= FW_T4_WB) {
             m_fromWB = fahrwege[fsNum];
           }
         }

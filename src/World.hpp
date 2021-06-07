@@ -52,6 +52,7 @@ class World {
   private:
     CRGB leds[NUM_LEDS];
     Signal signals[NUM_SIGNALS];
+    Train trackTrains[4];
     Fahrweg *fahrwege[NUM_FAHRWEGE];
     bool m_isTestMode;
     uint8_t m_lastStart = 0x7;

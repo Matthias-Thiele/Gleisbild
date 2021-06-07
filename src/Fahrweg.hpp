@@ -20,7 +20,7 @@ class Fahrweg {
     void setBlock(bool isRemote);
     bool isShown();
     Train* getTrain();
-    void setTrains(Train **trackTrains);
+    void setTrains(Train *trackTrains);
     uint8_t getTrack();
 
   private:
@@ -34,7 +34,7 @@ class Fahrweg {
     bool m_shown;
     AsyncTimer* m_timer;
     bool m_sectionBlockIsRemote;
-    Train **m_trackTrains;
+    Train *m_trackTrains;
     uint8_t m_track;
     bool m_trainRunning;
 };
