@@ -1,5 +1,9 @@
 #include "Train.hpp"
 
+Train::Train() {
+  clear();
+}
+
 void Train::init(CRGB* leds, CRGB trainColor, CRGB trackColor) {
   m_leds = leds;
   m_trackColor = trackColor;
@@ -10,6 +14,17 @@ void Train::init(CRGB* leds, CRGB trainColor, CRGB trackColor) {
 void Train::clear() {
   for (int i = 0; i < TRAIN_LENGTH; i++) {
     m_positions[i] = -1;
+  }
+}
+
+void Train::adjust(short firstPosition) {
+  if ((m_positions[0] == firstPosition) && (m_positions[TRAIN_LENGTH - 1] != firstPosition)) {
+    short tmp = m_positions[0];
+    m_positions[0] = m_positions[TRAIN_LENGTH - 1];
+    m_positions[TRAIN_LENGTH - 1] = tmp;
+    tmp = m_positions[1];
+    m_positions[1] = m_positions[TRAIN_LENGTH - 2];
+    m_positions[TRAIN_LENGTH - 2] = tmp;
   }
 }
 
@@ -40,7 +55,7 @@ void Train::setPositions(short* pos) {
 }
 
 void Train::redraw() {
-  for (int i = 0; i < TRAIN_LENGTH; i++) {
+  for (uint8_t i = 0; i < TRAIN_LENGTH; i++) {
     int toPosition = m_positions[i];
     if (toPosition != -1) {
       m_leds[toPosition] = m_trainColor;
@@ -49,7 +64,7 @@ void Train::redraw() {
 }
 
 bool Train::isEmpty() {
-  for (int i = 0; i < TRAIN_LENGTH; i++) {
+  for (uint8_t i = 0; i < TRAIN_LENGTH; i++) {
     if (m_positions[i] != -1) {
       return false;
     }

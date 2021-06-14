@@ -6,8 +6,10 @@
 
 class Train {
   public:
+    Train();
     void init(CRGB* leds, CRGB trainColor, CRGB trackColor);
     void advance(short toPosition);
+    void adjust(short startPosition);
     bool isEmpty();
     void redraw();
     short* getPositions();

@@ -63,7 +63,7 @@ bool Fahrweg::isShown() {
 }
 
 void Fahrweg::show(Train* train) {
-  Serial.print("Show fw "); Serial.println((long) train, HEX);
+  Serial.print("Show fw, train: "); Serial.println((long) train, HEX);
   m_fwi.setFahrwegList(m_fahrwegItems);
 
   while (m_fwi.hasMore()) {
@@ -123,6 +123,8 @@ void Fahrweg::set(short* fahrwegItems, unsigned long* eventList, uint8_t track, 
 }
 
 void Fahrweg::start() {
+  Serial.print("start() "); Serial.print(m_fwi.peekPos()); Serial.print(", train ");Serial.println(m_train.getPositions()[0]);
+  m_train.adjust(m_fwi.peekPos());
   m_trainRunning = true;
 }
 
@@ -192,7 +194,7 @@ void Fahrweg::advance(bool testMode) {
             break;
         
           case STOP_TRAIN:
-            Serial.println("Train stopped");
+            //Serial.println("Train stopped");
             if (testMode) {
               m_shown = false;
               Serial.println("Clear 1");
