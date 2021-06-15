@@ -110,7 +110,7 @@ void Fahrweg::show(Train* train) {
     }
   }
 
-  Serial.println("done.");
+  Serial.println("Show done.");
 }
 
 void Fahrweg::set(short* fahrwegItems, unsigned long* eventList, uint8_t track, boolean isInbound) {
@@ -149,15 +149,31 @@ uint8_t Fahrweg::getTrack() {
 }
 
 void Fahrweg::advance(bool testMode) {
+  /*Serial.print("Advance pos: "); Serial.print(m_fwi.peekPos()); 
+  Serial.print(", test: "); Serial.print(testMode); 
+  Serial.print(", empty: "); Serial.print(m_train.isEmpty()); 
+  Serial.print(", track: "); Serial.print(m_track); 
+  Serial.print(", shown: "); Serial.print(m_shown); 
+  Serial.print(", shown and empty: "); Serial.print(m_shown && m_train.isEmpty()); 
+  Serial.print(", mtt empty: "); Serial.print(m_trackTrains[m_track].isEmpty()); 
+  Serial.print(", this: "); Serial.println((long)this, HEX);*/
   g_isTestMode = testMode;
+
+  if (!testMode && m_shown && m_train.isEmpty()) {
+    if ((m_track != 0xff) && m_train.isEmpty() && !m_trackTrains[m_track].isEmpty()) {
+      Serial.print("Start train "); Serial.println((long)this, HEX);
+      m_train.setPositions(m_trackTrains[m_track].getPositions());
+      m_trackTrains[m_track].clear();
+      start();
+    }
+  }
+
   if (!testMode && !m_trainRunning) {
     return;
   }
 
   if (m_fwi.hasMore() || (!m_isInbound && !m_train.isEmpty())) {
-  //if (m_fwi.hasMore()) {
     short pos = m_fwi.peekPos();
-    //Serial.print("now at pos "); Serial.println(pos);
 
     unsigned long* evp = m_eventList;
     while (unsigned long ev = *evp++) {
@@ -217,11 +233,11 @@ void Fahrweg::advance(bool testMode) {
           case TRACK:
             if (m_track != 0xff) {
               if (ev & TRACK_ALLOCATE) {
-                if (m_trackTrains[m_track].isEmpty()) {
+                if (m_trackTrains[m_track].isEmpty() && !m_train.isEmpty()) {
                   Serial.print("Track allocated "); Serial.println(m_track);
+                  m_trackTrains[m_track].setPositions(m_train.getPositions());
+                  m_train.clear();
                 }
-
-                m_trackTrains[m_track].setPositions(m_train.getPositions());
               }
               if (ev & TRACK_RELEASE) {
                 if (!m_trackTrains[m_track].isEmpty()) {
