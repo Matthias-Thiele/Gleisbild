@@ -9,7 +9,7 @@
 class Fahrweg {
   public:
     static void setSignals(Signal* signals);
-    Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor);
+    Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor, CRGB occupiedColor);
     void set(short* fahrwegItems, unsigned long* eventList, uint8_t track, boolean isInbound);
     void show(Train* train);
     void start();
@@ -24,6 +24,7 @@ class Fahrweg {
     uint8_t getTrack();
 
   private:
+    void send(uint8_t value);
     short* m_fahrwegItems;
     unsigned long* m_eventList;
     CRGB* m_leds;

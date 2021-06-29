@@ -7,6 +7,11 @@
 
 extern bool ledsChanged;
 
+CRGB trainColor = {0, 0, 0xff};
+CRGB trackColor = {0x20, 0x20, 0x20};
+CRGB occupiedColor = {0x40, 0x40, 0x0};
+
+
 unsigned long dummyEventList[] = {0};
 int testList[] = {FW_AH_T3, FW_WB_T2, FW_LB_T4, FW_T3_LB, FW_T2_AH, FW_LB_T1, FW_T1_WB, FW_LB_T3, FW_T4_AH, FW_WB_T4,
                   FW_T4_LB, FW_T3_AH, FW_WB_T1, FW_LB_T2, FW_AH_T4, FW_T1_LB, FW_T2_WB, FW_T4_WB, FW_AH_T2, FW_T2_LB, 
@@ -15,19 +20,23 @@ int testList[] = {FW_AH_T3, FW_WB_T2, FW_LB_T4, FW_T3_LB, FW_T2_AH, FW_LB_T1, FW
 // Einfahrt von Bad Liebenzell
 short lbefs[] = {315, 385, -1};
 unsigned long lbefsev[] = {
-  WAIT_FOR_BLOCK | BLOCK_LB | BLOCK_IS_REMOTE | 319ul,
+  BLOCK_FIELD | BLOCK_LB | BLOCK_IS_REMOTE | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
+  BLOCK_FIELD | BLOCK_END_SET_LB | 336ul,
   WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
   0
 };
 
 short lbt1[] = {315, 389, 204, 155, -1};
 unsigned long lbt1234ev[] = {
-  WAIT_FOR_BLOCK | BLOCK_LB | 319ul,
+  BLOCK_FIELD | BLOCK_LB | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
-  WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
+  BLOCK_FIELD | BLOCK_END_SET_LB | 336ul,
+   WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
+  OCCUPANCY | OCCUP_LB_ON | 385,
+  OCCUPANCY | OCCUP_LB_OFF | 389,
   SET_SIGNAL | (0ul << 12) | 370ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 190ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 56ul | ONLY_TEST,
@@ -49,7 +58,7 @@ short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 450, -1};
 // Einfahrt von Althengstett
 short ahefs[] = {280, 207, -1};
 unsigned long ahefsev[] = {
-  WAIT_FOR_BLOCK | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
+  BLOCK_FIELD | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
   WAIT_FOR_SIGNAL | (1ul << 12) | 212ul,
@@ -58,9 +67,11 @@ unsigned long ahefsev[] = {
 
 short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
 unsigned long aht234ev[] = {
-  WAIT_FOR_BLOCK | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
+  BLOCK_FIELD | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
+  OCCUPANCY | OCCUP_AH_ON | 210,
+  OCCUPANCY | OCCUP_AH_OFF | 206,
   WAIT_FOR_SIGNAL | (1ul << 12) | 212ul,
   SET_SIGNAL | (1ul << 12) | 220ul | ONLY_TEST,
   RESET_SIGNAL | (1ul << 12) | 392ul | ONLY_TEST,
@@ -78,7 +89,7 @@ short aht4[] = {280, 206, 391, 393, 403, 450, -1};
 // Einfahrt von Wildberg
 short wbefs[] = {544, 558, 529, 473, -1};
 unsigned long wbefsev[] = {
-  WAIT_FOR_BLOCK | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
+  BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
   SET_SIGNAL | (15ul << 12) | 544ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
   WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
@@ -87,10 +98,12 @@ unsigned long wbefsev[] = {
 
 short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
 unsigned long wbt124ev[] = {
-  WAIT_FOR_BLOCK | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
+  BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
   SET_SIGNAL | (15ul << 12) | 544ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
   WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
+  OCCUPANCY | OCCUP_WB_ON | 473,
+  OCCUPANCY | OCCUP_WB_OFF | 469,
   SET_SIGNAL | (2ul << 12) | 490ul | ONLY_TEST,
   RESET_SIGNAL | (2ul << 12) | 140ul | ONLY_TEST,
   RESET_SIGNAL | (2ul << 12) | 110ul | ONLY_TEST,
@@ -113,6 +126,8 @@ unsigned long cwbt1ev[] = {
   WAIT_FOR_SIGNAL | (7ul << 12) | 169ul,
   SET_SIGNAL | (7ul << 12) | 166ul | ONLY_TEST,
   RESET_SIGNAL | (7ul << 12) | 135ul | ONLY_TEST,
+  OCCUPANCY | OCCUP_WB_ON | 469,
+  OCCUPANCY | OCCUP_WB_OFF | 473,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
   0
@@ -123,6 +138,8 @@ unsigned long cwbt2ev[] = {
   WAIT_FOR_SIGNAL | (8ul << 12) | 89ul,
   SET_SIGNAL | (8ul << 12) | 91ul | ONLY_TEST,
   RESET_SIGNAL | (8ul << 12) | 129ul | ONLY_TEST,
+  OCCUPANCY | OCCUP_WB_ON | 469,
+  OCCUPANCY | OCCUP_WB_OFF | 473,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
   0
@@ -133,6 +150,8 @@ unsigned long cwbt4ev[] = {
   WAIT_FOR_SIGNAL | (9ul << 12) | 436ul,
   SET_SIGNAL | (9ul << 12) | 439ul | ONLY_TEST,
   RESET_SIGNAL | (9ul << 12) | 460ul | ONLY_TEST,
+  OCCUPANCY | OCCUP_WB_ON | 469,
+  OCCUPANCY | OCCUP_WB_OFF | 473,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
   0
@@ -144,6 +163,8 @@ unsigned long clbt1ev[] = {
   WAIT_FOR_SIGNAL | (3ul << 12) | 165ul,
   SET_SIGNAL | (3ul << 12) | 166ul | ONLY_TEST,
   RESET_SIGNAL | (3ul << 12) | 190ul | ONLY_TEST,
+  OCCUPANCY | OCCUP_LB_ON | 389,
+  OCCUPANCY | OCCUP_LB_OFF | 385,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
   0
@@ -154,6 +175,8 @@ unsigned long clbt2ev[] = {
   WAIT_FOR_SIGNAL | (4ul << 12) | 93ul,
   SET_SIGNAL | (4ul << 12) | 88ul | ONLY_TEST,
   RESET_SIGNAL | (4ul << 12) | 60ul | ONLY_TEST,
+  OCCUPANCY | OCCUP_LB_ON | 389,
+  OCCUPANCY | OCCUP_LB_OFF | 385,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
   0
@@ -164,6 +187,8 @@ unsigned long clbt3ev[] = {
   WAIT_FOR_SIGNAL | (5ul << 12) | 8ul,
   SET_SIGNAL | (5ul << 12) | 10ul | ONLY_TEST,
   RESET_SIGNAL | (5ul << 12) | 30ul | ONLY_TEST,
+  OCCUPANCY | OCCUP_LB_ON | 389,
+  OCCUPANCY | OCCUP_LB_OFF | 385,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
   0
@@ -174,6 +199,8 @@ unsigned long clbt4ev[] = {
   WAIT_FOR_SIGNAL | (6ul << 12) | 440ul,
   SET_SIGNAL | (6ul << 12) | 430ul | ONLY_TEST,
   RESET_SIGNAL | (6ul << 12) | 420ul | ONLY_TEST,
+  OCCUPANCY | OCCUP_LB_ON | 389,
+  OCCUPANCY | OCCUP_LB_OFF | 385,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
   0
@@ -186,6 +213,8 @@ unsigned long caht2ev[] = {
   SET_SIGNAL | (4ul << 12) | 91ul | ONLY_TEST,
   RESET_SIGNAL | (4ul << 12) | 392ul | ONLY_TEST,
   TRACK | TRACK_RELEASE | 392ul,
+  OCCUPANCY | OCCUP_AH_ON | 206,
+  OCCUPANCY | OCCUP_AH_OFF | 210,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   0
@@ -197,6 +226,8 @@ unsigned long caht3ev[] = {
   SET_SIGNAL | (5ul << 12) | 10ul | ONLY_TEST,
   RESET_SIGNAL | (5ul << 12) | 392ul | ONLY_TEST,
   TRACK | TRACK_RELEASE | 392ul,
+  OCCUPANCY | OCCUP_AH_ON | 206,
+  OCCUPANCY | OCCUP_AH_OFF | 210,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   0
@@ -208,6 +239,8 @@ unsigned long caht4ev[] = {
   SET_SIGNAL | (6ul << 12) | 438ul | ONLY_TEST,
   RESET_SIGNAL | (6ul << 12) | 392ul | ONLY_TEST,
   TRACK | TRACK_RELEASE | 392ul,
+  OCCUPANCY | OCCUP_AH_ON | 206,
+  OCCUPANCY | OCCUP_AH_OFF | 210,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   0
@@ -229,8 +262,11 @@ World::World() {
 void World::initSignals() {
   Signal::setLeds(leds);
   signals[0].setLedNo(390); // Einf. Calw von LB
+  signals[0].setMelder(1);
   signals[1].setLedNo(205); // Einf. Calw von AH
+  signals[1].setMelder(2);
   signals[2].setLedNo(468); // Einf. Calw von WB
+  signals[2].setMelder(3);
   signals[3].setLedNo(37); // Ausf. G1 nach LB
   signals[4].setLedNo(36); // Ausf. G2 nach LB/ AH
   signals[5].setLedNo(35); // Ausf. G3 nach LB/ AH
@@ -253,10 +289,8 @@ void World::initSignals() {
 void World::initFahrstrassen() {
   Fahrweg::setSignals(signals);
 
-  CRGB trainColor = {0, 0, 0xff};
-  CRGB trackColor = {0x20, 0x20, 0x20};
   for (int i = 0; i < NUM_FAHRWEGE; i++) {
-    fahrwege[i] = new Fahrweg(leds, trainColor, trackColor);
+    fahrwege[i] = new Fahrweg(leds, trainColor, trackColor, occupiedColor);
     fahrwege[i]->setTrains(trackTrains);
   }
 
@@ -358,7 +392,7 @@ void World::processCommand(uint8_t cmd) {
     case 4:
     case 5:
       // Streckenblock
-      updateStreckenblock(cmd & 0x7);
+      updateStreckenblock(cmd & 0xf);
       break;
 
     case 8:

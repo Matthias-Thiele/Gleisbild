@@ -11,6 +11,11 @@ bool g_isTestMode;
 //  fw->advance(g_isTestMode);
 //}
 
+void Fahrweg::send(uint8_t value) {
+  //Serial.print("Send: "); Serial.println(value, HEX);
+  Serial1.write(value);
+}
+
 void Fahrweg::setSignals(Signal* signals) {
   g_signals = signals;
 }
@@ -19,8 +24,8 @@ void Fahrweg::setTrains(Train *trackTrains) {
   m_trackTrains = trackTrains;
 }
 
-Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor) {
-  m_train.init(leds, trainColor, trackColor);
+Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor, CRGB occupiedColor) {
+  m_train.init(leds, trainColor, trackColor, occupiedColor);
   m_leds = leds;
   m_trackColor = trackColor;
   m_timer = NULL;
@@ -181,6 +186,9 @@ void Fahrweg::advance(bool testMode) {
         int sig = (ev >> 12) & 0xff;
         bool isRemote = sig & BLOCK_IS_REMOTE;
         bool onlyTest = ev & ONLY_TEST;
+        uint8_t occ = 0xf0 | sig;
+        uint8_t blkf = 0xd0 | ((sig >> 4) & 0xf);
+
         /*Serial.print("now at pos "); Serial.print(pos);
         Serial.print(", Test "); Serial.print(testMode);
         Serial.print(", Signal "); Serial.print(sig);
@@ -188,10 +196,22 @@ void Fahrweg::advance(bool testMode) {
         Serial.print(", Section "); Serial.print(m_sectionBlockIsRemote);
         Serial.print(", Event "); Serial.println(ev >> 20, HEX); */
         switch (ev & 0xff00000) {
-          case WAIT_FOR_BLOCK:
-            if (!testMode && (m_sectionBlockIsRemote != isRemote)) {
-              Serial.println("Wait for section block.");
-              return;
+          case OCCUPANCY:
+            Serial.print("Occupancy: "); Serial.println(occ, HEX);
+            send(occ);
+            m_train.occupancy((occ & 1) == 0);
+            break;
+            
+          case BLOCK_FIELD:
+            Serial.print("Block field "); Serial.print(sig, HEX); Serial.print(", isRemote: "); Serial.print(isRemote); Serial.print(", m_sBIR: "); Serial.println(m_sectionBlockIsRemote);
+            if (sig < 0x10) {
+              if (!testMode && (m_sectionBlockIsRemote != isRemote)) {
+                Serial.println("Wait for section block.");
+                return;
+              }
+            } else {
+              Serial.print("Change block field "); Serial.println(blkf, HEX);
+              send(blkf);
             }
             break;
 

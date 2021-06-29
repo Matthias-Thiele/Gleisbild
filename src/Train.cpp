@@ -4,17 +4,25 @@ Train::Train() {
   clear();
 }
 
-void Train::init(CRGB* leds, CRGB trainColor, CRGB trackColor) {
+void Train::init(CRGB* leds, CRGB trainColor, CRGB trackColor, CRGB occupiedColor) {
   m_leds = leds;
   m_trackColor = trackColor;
   m_trainColor = trainColor;
+  m_occupiedColor = occupiedColor;
   clear();
 }
 
 void Train::clear() {
+  m_isOccupied = false;
   for (int i = 0; i < TRAIN_LENGTH; i++) {
     m_positions[i] = -1;
   }
+}
+
+void Train::occupancy(bool isOccupied) {
+  Serial.print("Is occupied: "); Serial.println(isOccupied);
+  m_isOccupied = isOccupied;
+  redraw();
 }
 
 void Train::adjust(short firstPosition) {
@@ -40,7 +48,7 @@ void Train::advance(short toPosition) {
 
   m_positions[0] = toPosition;
   if (toPosition >= 0) {
-    m_leds[toPosition] = m_trainColor;
+    m_leds[toPosition] = m_isOccupied ? m_occupiedColor : m_trainColor;
   }
 }
 
@@ -58,7 +66,7 @@ void Train::redraw() {
   for (uint8_t i = 0; i < TRAIN_LENGTH; i++) {
     int toPosition = m_positions[i];
     if (toPosition != -1) {
-      m_leds[toPosition] = m_trainColor;
+      m_leds[toPosition] = m_isOccupied ? m_occupiedColor : m_trainColor;
     }
   }
 }

@@ -4,11 +4,18 @@
 #define WAIT_FOR_SIGNAL 0x400000ul
 #define STOP_TRAIN 0x800000ul
 
-#define WAIT_FOR_BLOCK 0x1000000ul
+#define BLOCK_FIELD 0x1000000ul
 #define BLOCK_LB 0x1000ul
 #define BLOCK_AH 0x2000ul
 #define BLOCK_WB 0x3000ul
 #define BLOCK_IS_REMOTE 0x8000ul
+
+#define BLOCK_END_SET_LB 0x20000ul
+#define BLOCK_END_SET_AH 0x40000ul
+#define BLOCK_END_SET_WB 0x60000ul
+#define BLOCK_START_RESET_LB 0x30000ul
+#define BLOCK_START_RESET_AH 0x50000ul
+#define BLOCK_START_RESET_WB 0x70000ul
 
 #define TRACK 0x2000000ul
 #define TRACK_RELEASE 0x1000ul
@@ -18,5 +25,12 @@
 #define TRACK_3 2
 #define TRACK_4 3
 
+#define OCCUPANCY 0x4000000ul
+#define OCCUP_LB_ON 0x2000ul
+#define OCCUP_LB_OFF 0x3000ul
+#define OCCUP_AH_ON 0x4000ul
+#define OCCUP_AH_OFF 0x5000ul
+#define OCCUP_WB_ON 0x6000ul
+#define OCCUP_WB_OFF 0x7000ul
 
 #define ONLY_TEST 0x10000000ul
