@@ -63,12 +63,15 @@ void Train::setPositions(short* pos) {
 }
 
 void Train::redraw() {
+  Serial.print("Train redraw "); Serial.print((long)this, HEX);
   for (uint8_t i = 0; i < TRAIN_LENGTH; i++) {
     int toPosition = m_positions[i];
+    Serial.print(" "); Serial.print(toPosition);
     if (toPosition != -1) {
       m_leds[toPosition] = m_isOccupied ? m_occupiedColor : m_trainColor;
     }
   }
+  Serial.println();
 }
 
 bool Train::isEmpty() {

@@ -29,7 +29,7 @@ void Signal::setMelder(uint8_t melderNo) {
 void Signal::send(bool setReset) {
   if (m_melderNo != 0xff) {
     uint8_t value = 0xe0 | (m_melderNo << 1) | (!setReset & 1);
-    Serial.print("Send: "); Serial.println(value, HEX);
+    // Serial.print("Send: "); Serial.println(value, HEX);
     Serial1.write(value);
   }
 }

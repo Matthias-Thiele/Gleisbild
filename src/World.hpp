@@ -70,6 +70,7 @@ class World {
     void updateStreckenblock(uint8_t source);
     void setFahrstrasse(uint8_t source);
     void changeFW(uint8_t fwNum, bool setClear);
+    Fahrweg* selectFW(uint8_t noSelection, uint8_t firstNum, uint8_t lastNum);
 };
 
 #endif

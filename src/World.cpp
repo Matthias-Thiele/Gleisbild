@@ -61,6 +61,7 @@ unsigned long ahefsev[] = {
   BLOCK_FIELD | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
+  BLOCK_FIELD | BLOCK_END_SET_AH | 259ul,
   WAIT_FOR_SIGNAL | (1ul << 12) | 212ul,
   0
 };
@@ -70,6 +71,7 @@ unsigned long aht234ev[] = {
   BLOCK_FIELD | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
+  BLOCK_FIELD | BLOCK_END_SET_AH | 259ul,
   OCCUPANCY | OCCUP_AH_ON | 210,
   OCCUPANCY | OCCUP_AH_OFF | 206,
   WAIT_FOR_SIGNAL | (1ul << 12) | 212ul,
@@ -92,6 +94,7 @@ unsigned long wbefsev[] = {
   BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
   SET_SIGNAL | (15ul << 12) | 544ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
+  BLOCK_FIELD | BLOCK_END_SET_WB | 519ul,
   WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
   0
 };
@@ -101,6 +104,7 @@ unsigned long wbt124ev[] = {
   BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
   SET_SIGNAL | (15ul << 12) | 544ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
+  BLOCK_FIELD | BLOCK_END_SET_WB | 519ul,
   WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
   OCCUPANCY | OCCUP_WB_ON | 473,
   OCCUPANCY | OCCUP_WB_OFF | 469,
@@ -130,6 +134,7 @@ unsigned long cwbt1ev[] = {
   OCCUPANCY | OCCUP_WB_OFF | 473,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
+  BLOCK_FIELD | BLOCK_START_RESET_WB | 540ul,
   0
 };
 
@@ -142,6 +147,7 @@ unsigned long cwbt2ev[] = {
   OCCUPANCY | OCCUP_WB_OFF | 473,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
+  BLOCK_FIELD | BLOCK_START_RESET_WB | 540ul,
   0
 };
 
@@ -154,6 +160,7 @@ unsigned long cwbt4ev[] = {
   OCCUPANCY | OCCUP_WB_OFF | 473,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
+  BLOCK_FIELD | BLOCK_START_RESET_WB | 540ul,
   0
 };
 
@@ -167,6 +174,7 @@ unsigned long clbt1ev[] = {
   OCCUPANCY | OCCUP_LB_OFF | 385,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
+  BLOCK_FIELD | BLOCK_START_RESET_LB | 313ul,
   0
 };
 
@@ -179,6 +187,7 @@ unsigned long clbt2ev[] = {
   OCCUPANCY | OCCUP_LB_OFF | 385,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
+  BLOCK_FIELD | BLOCK_START_RESET_LB | 313ul,
   0
 };
 
@@ -191,6 +200,7 @@ unsigned long clbt3ev[] = {
   OCCUPANCY | OCCUP_LB_OFF | 385,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
+  BLOCK_FIELD | BLOCK_START_RESET_LB | 313ul,
   0
 };
 
@@ -203,6 +213,7 @@ unsigned long clbt4ev[] = {
   OCCUPANCY | OCCUP_LB_OFF | 385,
   SET_SIGNAL | (10ul << 12) | 350ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
+  BLOCK_FIELD | BLOCK_START_RESET_LB | 313ul,
   0
 };
 
@@ -217,6 +228,7 @@ unsigned long caht2ev[] = {
   OCCUPANCY | OCCUP_AH_OFF | 210,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
+  BLOCK_FIELD | BLOCK_START_RESET_AH | 288ul,
   0
 };
 
@@ -230,6 +242,7 @@ unsigned long caht3ev[] = {
   OCCUPANCY | OCCUP_AH_OFF | 210,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
+  BLOCK_FIELD | BLOCK_START_RESET_AH | 288ul,
   0
 };
 
@@ -243,6 +256,7 @@ unsigned long caht4ev[] = {
   OCCUPANCY | OCCUP_AH_OFF | 210,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
+  BLOCK_FIELD | BLOCK_START_RESET_AH | 288ul,
   0
 };
 
@@ -457,23 +471,35 @@ void World::startTrain(uint8_t source) {
   Serial.print("Start train "); Serial.println(source);
   switch (source) {
     case 0:
-      m_fromLB = fahrwege[FW_LB_EFS];
+      m_fromLB = selectFW(FW_LB_EFS, FW_LB_T1, FW_LB_T4);
       m_fromLB->show(NULL);
       m_fromLB->start();
       break;
     case 1:
       if (!m_fromAH) {
-        m_fromAH = fahrwege[FW_AH_EFS];
+        m_fromAH = selectFW(FW_AH_EFS, FW_AH_T2, FW_AH_T4);
         m_fromAH->show(NULL);
       }
       m_fromAH->start();
       break;
     case 2:
-      m_fromWB = fahrwege[FW_WB_EFS];
+      m_fromWB = selectFW(FW_WB_EFS, FW_WB_T1, FW_WB_T4);
       m_fromWB->show(NULL);
       m_fromWB->start();
       break;
   }
+}
+
+Fahrweg* World::selectFW(uint8_t noSelection, uint8_t firstNum, uint8_t lastNum) {
+  Fahrweg* result = fahrwege[noSelection];
+  for (uint8_t fw = firstNum; fw <= lastNum; fw++) {
+    if (fahrwege[fw]->isShown()) {
+      result = fahrwege[fw];
+      break;
+    }
+  }
+
+  return result;
 }
 
 void World::changeFW(uint8_t fwNum, bool setClear) {
@@ -482,6 +508,7 @@ void World::changeFW(uint8_t fwNum, bool setClear) {
     if (setClear) {
       fw->show(NULL);
     } else {
+      Serial.print("changeFW, clear "); Serial.println(fwNum);
       fw->clear();
     }
   }

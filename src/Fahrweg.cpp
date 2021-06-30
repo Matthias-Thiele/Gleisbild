@@ -55,6 +55,7 @@ void Fahrweg::clear() {
     }
   }
 
+  Serial.print("Is inbound? "); Serial.println(m_isInbound);
   if (m_isInbound) {
     m_train.redraw();
   }
@@ -134,8 +135,12 @@ void Fahrweg::start() {
 }
 
 void Fahrweg::stop() {
-  m_trainRunning = false;
-  m_train.clear();
+  if (m_trainRunning) {
+    Serial.println("stop fahrweg.");
+  
+    m_trainRunning = false;
+    m_train.clear();
+  }
 }
 
 void Fahrweg::setBlock(bool isRemote) {
@@ -165,7 +170,7 @@ void Fahrweg::advance(bool testMode) {
   g_isTestMode = testMode;
 
   if (!testMode && m_shown && m_train.isEmpty()) {
-    if ((m_track != 0xff) && m_train.isEmpty() && !m_trackTrains[m_track].isEmpty()) {
+    if (!m_isInbound && (m_track != 0xff) && m_train.isEmpty() && !m_trackTrains[m_track].isEmpty()) {
       Serial.print("Start train "); Serial.println((long)this, HEX);
       m_train.setPositions(m_trackTrains[m_track].getPositions());
       m_trackTrains[m_track].clear();
@@ -256,7 +261,7 @@ void Fahrweg::advance(bool testMode) {
                 if (m_trackTrains[m_track].isEmpty() && !m_train.isEmpty()) {
                   Serial.print("Track allocated "); Serial.println(m_track);
                   m_trackTrains[m_track].setPositions(m_train.getPositions());
-                  m_train.clear();
+                  //m_train.clear();
                 }
               }
               if (ev & TRACK_RELEASE) {
