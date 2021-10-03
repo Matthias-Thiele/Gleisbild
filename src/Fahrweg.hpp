@@ -18,13 +18,16 @@ class Fahrweg {
     bool done();
     void clear();
     void setBlock(bool isRemote);
+    void setFreeState(bool isFree);
     bool isShown();
+    bool isRunning();
     Train* getTrain();
     void setTrains(Train *trackTrains);
     uint8_t getTrack();
 
   private:
     void send(uint8_t value);
+    void sendTrainArrived(uint8_t source);
     short* m_fahrwegItems;
     unsigned long* m_eventList;
     CRGB* m_leds;
@@ -35,9 +38,11 @@ class Fahrweg {
     bool m_shown;
     AsyncTimer* m_timer;
     bool m_sectionBlockIsRemote;
+    bool m_sectionIsFree;
     Train *m_trackTrains;
     uint8_t m_track;
-    bool m_trainRunning;
+    short m_trainRunning;
+    bool m_arrivalSent = false;
 };
 
 #endif

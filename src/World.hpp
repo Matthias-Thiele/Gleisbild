@@ -55,14 +55,24 @@ class World {
     Train trackTrains[4];
     Fahrweg *fahrwege[NUM_FAHRWEGE];
     bool m_isTestMode;
-    uint8_t m_lastStart = 0x7;
+    uint8_t m_lastStart = 0;
     unsigned long lastStep = 0;
 
     Fahrweg *m_fromLB = NULL;
     Fahrweg *m_fromAH = NULL;
     Fahrweg *m_fromWB = NULL;
     bool m_streckeIsRemote[3];
+    bool m_streckeIsFree[3];
+    bool m_signalLBActive = false;
+    bool m_signalAHActive = false;
 
+    bool m_befehlNothing = true;
+    bool m_befehlAusfahrtWB = false;
+    bool m_befehlEinfahrtWB = false;
+    unsigned long m_ActivateEinfahrt = UINT32_MAX;
+    unsigned long m_ActivateAusfahrt = UINT32_MAX;
+    
+    void send(uint8_t value);
     void initSignals();
     void initFahrstrassen();
     void checkStartTrain(uint8_t source);
@@ -70,6 +80,7 @@ class World {
     void updateStreckenblock(uint8_t source);
     void setFahrstrasse(uint8_t source);
     void changeFW(uint8_t fwNum, bool setClear);
+    void checkSignal(uint8_t fsNum);
     Fahrweg* selectFW(uint8_t noSelection, uint8_t firstNum, uint8_t lastNum);
 };
 

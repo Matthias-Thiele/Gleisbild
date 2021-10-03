@@ -20,7 +20,7 @@ int testList[] = {FW_AH_T3, FW_WB_T2, FW_LB_T4, FW_T3_LB, FW_T2_AH, FW_LB_T1, FW
 // Einfahrt von Bad Liebenzell
 short lbefs[] = {315, 385, -1};
 unsigned long lbefsev[] = {
-  BLOCK_FIELD | BLOCK_LB | BLOCK_IS_REMOTE | 319ul,
+  BLOCK_FIELD | BLOCK_LB | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
   BLOCK_FIELD | BLOCK_END_SET_LB | 336ul,
@@ -34,20 +34,22 @@ unsigned long lbt1234ev[] = {
   SET_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
   BLOCK_FIELD | BLOCK_END_SET_LB | 336ul,
-   WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
+  WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
   OCCUPANCY | OCCUP_LB_ON | 385,
   OCCUPANCY | OCCUP_LB_OFF | 389,
   SET_SIGNAL | (0ul << 12) | 370ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 190ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 56ul | ONLY_TEST,
   TRACK | TRACK_ALLOCATE | 164ul,
-  STOP_TRAIN | 164ul,
+  STOP_TRAIN_LB | 164ul,
   TRACK | TRACK_ALLOCATE | 94ul,
-  STOP_TRAIN | 94ul,
+  STOP_TRAIN_LB | 94ul,
+  OCCUPANCY | OCCUP_T3_ON | 20ul,
+  OCCUPANCY | OCCUP_T3_OFF | 15ul,
   TRACK | TRACK_ALLOCATE | 7ul,
-  STOP_TRAIN | 7ul,
+  STOP_TRAIN_LB | 7ul,
   TRACK | TRACK_ALLOCATE | 441ul,
-  STOP_TRAIN | 441ul,
+  STOP_TRAIN_LB | 441ul,
   0
 };
 
@@ -58,7 +60,7 @@ short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 450, -1};
 // Einfahrt von Althengstett
 short ahefs[] = {280, 207, -1};
 unsigned long ahefsev[] = {
-  BLOCK_FIELD | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
+  BLOCK_FIELD | BLOCK_AH | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
   BLOCK_FIELD | BLOCK_END_SET_AH | 259ul,
@@ -68,7 +70,7 @@ unsigned long ahefsev[] = {
 
 short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
 unsigned long aht234ev[] = {
-  BLOCK_FIELD | BLOCK_AH | BLOCK_IS_REMOTE | 275ul,
+  BLOCK_FIELD | BLOCK_AH | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
   RESET_SIGNAL | (13ul << 12) | 260ul,
   BLOCK_FIELD | BLOCK_END_SET_AH | 259ul,
@@ -78,11 +80,13 @@ unsigned long aht234ev[] = {
   SET_SIGNAL | (1ul << 12) | 220ul | ONLY_TEST,
   RESET_SIGNAL | (1ul << 12) | 392ul | ONLY_TEST,
   TRACK | TRACK_ALLOCATE | 94ul,
-  STOP_TRAIN | 94ul,
+  STOP_TRAIN_AH | 94ul,
+  OCCUPANCY | OCCUP_T3_ON | 20ul,
+  OCCUPANCY | OCCUP_T3_OFF | 15ul,
   TRACK | TRACK_ALLOCATE | 7ul,
-  STOP_TRAIN | 7ul,
+  STOP_TRAIN_AH | 7ul,
   TRACK | TRACK_ALLOCATE | 441ul,
-  STOP_TRAIN | 441ul,
+  STOP_TRAIN_AH | 441ul,
   0
 };
 short aht3[] = {280, 206, 391, 402, 48, 49, 33, 3, -1};
@@ -91,8 +95,8 @@ short aht4[] = {280, 206, 391, 393, 403, 450, -1};
 // Einfahrt von Wildberg
 short wbefs[] = {544, 558, 529, 473, -1};
 unsigned long wbefsev[] = {
-  BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
-  SET_SIGNAL | (15ul << 12) | 544ul,
+  BLOCK_FIELD | BLOCK_WB | 549ul,
+  SET_SIGNAL | (15ul << 12) | 549ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
   BLOCK_FIELD | BLOCK_END_SET_WB | 519ul,
   WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
@@ -100,67 +104,98 @@ unsigned long wbefsev[] = {
 };
 
 short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
-unsigned long wbt124ev[] = {
-  BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 548ul,
-  SET_SIGNAL | (15ul << 12) | 544ul,
+unsigned long wbt1ev[] = {
+  BLOCK_FIELD | BLOCK_WB | 548ul,
+  SET_SIGNAL | (15ul << 12) | 548ul,
   RESET_SIGNAL | (15ul << 12) | 520ul,
   BLOCK_FIELD | BLOCK_END_SET_WB | 519ul,
+  SET_SIGNAL | (2ul << 12) | 490ul | ONLY_TEST,
   WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
   OCCUPANCY | OCCUP_WB_ON | 473,
   OCCUPANCY | OCCUP_WB_OFF | 469,
-  SET_SIGNAL | (2ul << 12) | 490ul | ONLY_TEST,
-  RESET_SIGNAL | (2ul << 12) | 140ul | ONLY_TEST,
-  RESET_SIGNAL | (2ul << 12) | 110ul | ONLY_TEST,
-  RESET_SIGNAL | (2ul << 12) | 470ul | ONLY_TEST,
+  RESET_SIGNAL | (2ul << 12) | 170ul,
+  BLOCK_FIELD | BLOCK_END_RESET_WB | 169ul,
   TRACK | TRACK_ALLOCATE | 170ul,
-  STOP_TRAIN | 170ul,
-  TRACK | TRACK_ALLOCATE | 88ul,
-  STOP_TRAIN | 88ul,
-  TRACK | TRACK_ALLOCATE | 435ul,
-  STOP_TRAIN | 435,
+  STOP_TRAIN_WB1 | 170ul,
+  BEFEHLSABGABE_UNBLOCK_M1 | 170ul,
   0
 };
 
 short wbt2[] = {544, 558, 529, 469, 130, 125, 122, 78, -1};
 short wbt4[] = {544, 558, 529, 469, 130, 125, 122, 119, 467, 425, -1};
+unsigned long wbt24ev[] = {
+  BLOCK_FIELD | BLOCK_WB | 548ul,
+  SET_SIGNAL | (15ul << 12) | 548ul,
+  RESET_SIGNAL | (15ul << 12) | 520ul,
+  BLOCK_FIELD | BLOCK_END_SET_WB | 519ul,
+  SET_SIGNAL | (2ul << 12) | 490ul | ONLY_TEST,
+  WAIT_FOR_SIGNAL | (2ul << 12) | 474ul,
+  OCCUPANCY | OCCUP_WB_ON | 473,
+  OCCUPANCY | OCCUP_WB_OFF | 469,
+  RESET_SIGNAL | (2ul << 12) | 89ul,
+  RESET_SIGNAL | (2ul << 12) | 436ul,
+  BLOCK_FIELD | BLOCK_END_RESET_WB | 89ul,
+  BLOCK_FIELD | BLOCK_END_RESET_WB | 436ul,
+  TRACK | TRACK_ALLOCATE | 88ul,
+  BEFEHLSABGABE_UNBLOCK_M24 | 88ul,
+  STOP_TRAIN_WB24 | 88ul,
+  TRACK | TRACK_ALLOCATE | 435ul,
+  BEFEHLSABGABE_UNBLOCK_M24 | 435ul,
+  STOP_TRAIN_WB24 | 435ul,
+  0
+};
 
 // Ausfahrt nach Wildberg
 short cwbt1[] = {169, 130, 469, 543, -1};
 unsigned long cwbt1ev[] = {
-  WAIT_FOR_SIGNAL | (7ul << 12) | 169ul,
+  BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 165ul,
+  WAIT_FOR_SIGNAL | (7ul << 12) | 165ul,
   SET_SIGNAL | (7ul << 12) | 166ul | ONLY_TEST,
-  RESET_SIGNAL | (7ul << 12) | 135ul | ONLY_TEST,
+  STOP_TRAIN_WBOUT | 460ul,
+  BLOCK_FIELD | BEFEHLSABGABE_UNBLOCK_H | 475,
   OCCUPANCY | OCCUP_WB_ON | 469,
   OCCUPANCY | OCCUP_WB_OFF | 473,
+  RESET_SIGNAL | (7ul << 12) | 473,
+  BLOCK_FIELD | BLOCK_START_SET_WB | 473ul,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
-  BLOCK_FIELD | BLOCK_START_RESET_WB | 540ul,
+  BLOCK_FIELD | BLOCK_START_RESET_WB | 542ul,
+  STOP_TRAIN_ARRIVAL | 543,
   0
 };
 
 short cwbt2[] = {89, 122, 125, 129, 130, 130, 469, 543, -1};
 unsigned long cwbt2ev[] = {
-  WAIT_FOR_SIGNAL | (8ul << 12) | 89ul,
+  BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 93ul,
+  WAIT_FOR_SIGNAL | (8ul << 12) | 93ul,
   SET_SIGNAL | (8ul << 12) | 91ul | ONLY_TEST,
-  RESET_SIGNAL | (8ul << 12) | 129ul | ONLY_TEST,
+  STOP_TRAIN_WBOUT | 460ul,
+  BLOCK_FIELD | BEFEHLSABGABE_UNBLOCK_JK | 475,
   OCCUPANCY | OCCUP_WB_ON | 469,
   OCCUPANCY | OCCUP_WB_OFF | 473,
+  RESET_SIGNAL | (8ul << 12) | 473,
+  BLOCK_FIELD | BLOCK_START_SET_WB | 473ul,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
-  BLOCK_FIELD | BLOCK_START_RESET_WB | 540ul,
+  BLOCK_FIELD | BLOCK_START_RESET_WB | 542ul,
+  STOP_TRAIN_ARRIVAL | 543,
   0
 };
 
 short cwbt4[] = {436, 467, 119, 122, 125, 129, 130, 130, 469, 543, -1};
 unsigned long cwbt4ev[] = {
-  WAIT_FOR_SIGNAL | (9ul << 12) | 436ul,
+  BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 440ul,
+  WAIT_FOR_SIGNAL | (9ul << 12) | 440ul,
   SET_SIGNAL | (9ul << 12) | 439ul | ONLY_TEST,
-  RESET_SIGNAL | (9ul << 12) | 460ul | ONLY_TEST,
+  BLOCK_FIELD | BEFEHLSABGABE_UNBLOCK_JK | 475,
   OCCUPANCY | OCCUP_WB_ON | 469,
   OCCUPANCY | OCCUP_WB_OFF | 473,
+  RESET_SIGNAL | (9ul << 12) | 473,
+  BLOCK_FIELD | BLOCK_START_SET_WB | 473ul,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
-  BLOCK_FIELD | BLOCK_START_RESET_WB | 540ul,
+  BLOCK_FIELD | BLOCK_START_RESET_WB | 542ul,
+  STOP_TRAIN_ARRIVAL | 543,
   0
 };
 
@@ -172,9 +207,11 @@ unsigned long clbt1ev[] = {
   RESET_SIGNAL | (3ul << 12) | 190ul | ONLY_TEST,
   OCCUPANCY | OCCUP_LB_ON | 389,
   OCCUPANCY | OCCUP_LB_OFF | 385,
-  SET_SIGNAL | (10ul << 12) | 350ul,
+  BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 360,
+  SET_SIGNAL | (10ul << 12) | 340ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
-  BLOCK_FIELD | BLOCK_START_RESET_LB | 313ul,
+  BLOCK_FIELD | BLOCK_START_RESET_LB | 314ul,
+  STOP_TRAIN_ARRIVAL | 314,
   0
 };
 
@@ -185,9 +222,11 @@ unsigned long clbt2ev[] = {
   RESET_SIGNAL | (4ul << 12) | 60ul | ONLY_TEST,
   OCCUPANCY | OCCUP_LB_ON | 389,
   OCCUPANCY | OCCUP_LB_OFF | 385,
-  SET_SIGNAL | (10ul << 12) | 350ul,
+  BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 360,
+  SET_SIGNAL | (10ul << 12) | 340ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
-  BLOCK_FIELD | BLOCK_START_RESET_LB | 313ul,
+  BLOCK_FIELD | BLOCK_START_RESET_LB | 314ul,
+  STOP_TRAIN_ARRIVAL | 314,
   0
 };
 
@@ -198,9 +237,11 @@ unsigned long clbt3ev[] = {
   RESET_SIGNAL | (5ul << 12) | 30ul | ONLY_TEST,
   OCCUPANCY | OCCUP_LB_ON | 389,
   OCCUPANCY | OCCUP_LB_OFF | 385,
-  SET_SIGNAL | (10ul << 12) | 350ul,
+  BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 360,
+  SET_SIGNAL | (10ul << 12) | 340ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
-  BLOCK_FIELD | BLOCK_START_RESET_LB | 313ul,
+  BLOCK_FIELD | BLOCK_START_RESET_LB | 314ul,
+  STOP_TRAIN_ARRIVAL | 314,
   0
 };
 
@@ -211,9 +252,11 @@ unsigned long clbt4ev[] = {
   RESET_SIGNAL | (6ul << 12) | 420ul | ONLY_TEST,
   OCCUPANCY | OCCUP_LB_ON | 389,
   OCCUPANCY | OCCUP_LB_OFF | 385,
-  SET_SIGNAL | (10ul << 12) | 350ul,
+  BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 360,
+  SET_SIGNAL | (10ul << 12) | 340ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
-  BLOCK_FIELD | BLOCK_START_RESET_LB | 313ul,
+  BLOCK_FIELD | BLOCK_START_RESET_LB | 314ul,
+  STOP_TRAIN_ARRIVAL | 314,
   0
 };
 
@@ -226,9 +269,11 @@ unsigned long caht2ev[] = {
   TRACK | TRACK_RELEASE | 392ul,
   OCCUPANCY | OCCUP_AH_ON | 206,
   OCCUPANCY | OCCUP_AH_OFF | 210,
+  BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 230,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   BLOCK_FIELD | BLOCK_START_RESET_AH | 288ul,
+  STOP_TRAIN_ARRIVAL | 281,
   0
 };
 
@@ -240,9 +285,11 @@ unsigned long caht3ev[] = {
   TRACK | TRACK_RELEASE | 392ul,
   OCCUPANCY | OCCUP_AH_ON | 206,
   OCCUPANCY | OCCUP_AH_OFF | 210,
+  BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 230,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   BLOCK_FIELD | BLOCK_START_RESET_AH | 288ul,
+  STOP_TRAIN_ARRIVAL | 281,
   0
 };
 
@@ -254,9 +301,11 @@ unsigned long caht4ev[] = {
   TRACK | TRACK_RELEASE | 392ul,
   OCCUPANCY | OCCUP_AH_ON | 206,
   OCCUPANCY | OCCUP_AH_OFF | 210,
+  BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 230,
   SET_SIGNAL | (12ul << 12) | 250ul,
   RESET_SIGNAL | (12ul << 12) | 290ul,
   BLOCK_FIELD | BLOCK_START_RESET_AH | 288ul,
+  STOP_TRAIN_ARRIVAL | 281,
   0
 };
 
@@ -272,6 +321,11 @@ World::World() {
   initFahrstrassen();
 }
 
+void World::send(uint8_t value) {
+  //Serial.print("Send: "); Serial.println(value, HEX);
+  Serial1.write(value);
+  Serial2.write(value);
+}
 
 void World::initSignals() {
   Signal::setLeds(leds);
@@ -339,13 +393,13 @@ void World::initFahrstrassen() {
   fahrwege[FW_WB_EFS]->set(wbefs, wbefsev, 0xff, true);
 
   // Wildberg auf Gleis 1
-  fahrwege[FW_WB_T1]->set(wbt1, wbt124ev, 0, true);
+  fahrwege[FW_WB_T1]->set(wbt1, wbt1ev, 0, true);
 
   // Wildberg auf Gleis 2
-  fahrwege[FW_WB_T2]->set(wbt2, wbt124ev, 1, true);
+  fahrwege[FW_WB_T2]->set(wbt2, wbt24ev, 1, true);
 
   // Wildberg auf Gleis 4
-  fahrwege[FW_WB_T4]->set(wbt4, wbt124ev, 3, true);
+  fahrwege[FW_WB_T4]->set(wbt4, wbt24ev, 3, true);
 
   // Nach Wildberg von Gleis 1
   fahrwege[FW_T1_WB]->set(cwbt1, cwbt1ev, 0, false);
@@ -384,18 +438,44 @@ void World::processCommand(uint8_t cmd) {
     return;
   }
 
+  bool actVal;
   uint8_t pk = (cmd >> 4) & 0xf;
-  uint8_t maxSignal = (pk == 2) ? 2 : 4;
   //Serial.print("From Mega2 "); Serial.print(cmd, HEX); Serial.print(", "); Serial.println(pk);
   switch (pk) {
     case 0:
-    case 1:
-    case 2:
-      // Signalhebel
-      for (uint8_t i = 0; i < maxSignal; i++) {
-        setSignal((pk << 2) + i, !(cmd & (1 << i)));
-      }
+      // Befehlsabgaben
+      //Serial.print("From Mega2 "); Serial.print(cmd, HEX); Serial.print(", "); Serial.println(pk);
+      if (m_befehlNothing) {
+        actVal = cmd & 1;
+        //Serial.print("actval: "); Serial.print(actVal); Serial.print(", mBefAusf: "); Serial.println(m_befehlAusfahrtWB);
+        if (m_befehlAusfahrtWB != actVal) {
+          Serial.println("Activate Ausfahrt WB.");
+          m_ActivateAusfahrt = millis() + 5000ul;
+          m_befehlNothing = false;
+        }
+        m_befehlAusfahrtWB = actVal;
 
+        actVal = (cmd & 2) == 2;
+        //Serial.print("actval: "); Serial.print(actVal); Serial.print(", mBefEinf: "); Serial.println(m_befehlEinfahrtWB);
+        if (actVal && !m_befehlEinfahrtWB) {
+          Serial.println("Activate Einfahrt WB.");
+          m_ActivateEinfahrt = millis() + 5000ul;
+          m_befehlNothing = false;
+        }
+        m_befehlEinfahrtWB = actVal;
+      } else {
+        if ((cmd & 3) == 0) {
+          Serial.print("REset Befehlsabgabe: "); Serial.println(cmd, HEX);
+          m_befehlNothing = true;
+        }
+      }
+      break;
+
+    case 1:
+      // Gruppensignalhebel (Signal wird aus Fahrstraße ermittelt)
+      m_signalLBActive = cmd & 1;
+      m_signalAHActive = (cmd & 2) == 2;
+      //Serial.print("LB - AH: "); Serial.print(m_signalLBActive); Serial.print(" - "); Serial.println(m_signalAHActive);
       break;
 
     case 3:
@@ -404,7 +484,6 @@ void World::processCommand(uint8_t cmd) {
       break;
 
     case 4:
-    case 5:
       // Streckenblock
       updateStreckenblock(cmd & 0xf);
       break;
@@ -426,7 +505,7 @@ void World::checkStartTrain(uint8_t source) {
   uint8_t shiftedLast = m_lastStart;
 
   for (uint8_t i = 0; i < 3; i++) {
-    if (!(shiftedLast & 1) && (shiftedSource & 1)) {
+    if ((shiftedLast & 1) && !(shiftedSource & 1)) {
       startTrain(i);
     }
 
@@ -438,32 +517,67 @@ void World::checkStartTrain(uint8_t source) {
 }
 
 /**
- * Section block, lower nibble: 0 <Wildberg> <Althengstett> <Liebenzell>
+ * Section block, lower nibble: <Erl 0/Free 1> <Wildberg> <Althengstett> <Liebenzell>
  * 1: is remote, 0: is local
  **/
 void World::updateStreckenblock(uint8_t source) {
-  for (uint8_t i = 0; i < 3; i++) {
-    if (!(source & 1) != m_streckeIsRemote[i]) {
-      Serial.print("Switch block "); Serial.print(i); Serial.print(" to "); Serial.println(!(source & 1));
-    }
+  //Serial.print("Update Streckenblock "); Serial.println(source, HEX);
+  bool isErlaubnis = (source & 8) == 0;
 
-    m_streckeIsRemote[i] = !(source & 1);
+  for (uint8_t i = 0; i < 3; i++) {
+    if (isErlaubnis) {
+      if (!(source & 1) != m_streckeIsRemote[i]) {
+        Serial.print("Switch block "); Serial.print(i); Serial.print(" to "); Serial.println(!(source & 1));
+      }
+
+      m_streckeIsRemote[i] = !(source & 1);
+    } else {
+      if ((source & 1) != m_streckeIsFree[i]) {
+        Serial.print("Switch free state "); Serial.print(i); Serial.print(" to "); Serial.println(!(source & 1));
+      }
+
+      m_streckeIsFree[i] = source & 1;
+    }
     source >>= 1;
   }
 
   fahrwege[FW_LB_EFS]->setBlock(m_streckeIsRemote[0]);
+  fahrwege[FW_LB_EFS]->setFreeState(m_streckeIsFree[0]);
+
   for (uint8_t fwn = FW_LB_T1; fwn <= FW_LB_T4; fwn++) {
     fahrwege[fwn]->setBlock(m_streckeIsRemote[0]);
+    fahrwege[fwn]->setFreeState(m_streckeIsFree[0]);
+  }
+
+  for (uint8_t fwn = FW_T1_LB; fwn <= FW_T4_LB; fwn++) {
+    fahrwege[fwn]->setBlock(m_streckeIsRemote[0]);
+    fahrwege[fwn]->setFreeState(m_streckeIsFree[0]);
   }
 
   fahrwege[FW_AH_EFS]->setBlock(m_streckeIsRemote[1]);
+  fahrwege[FW_AH_EFS]->setFreeState(m_streckeIsFree[1]);
+
   for (uint8_t fwn = FW_AH_T2; fwn <= FW_AH_T4; fwn++) {
     fahrwege[fwn]->setBlock(m_streckeIsRemote[1]);
+    fahrwege[fwn]->setFreeState(m_streckeIsFree[1]);
+  }
+
+  for (uint8_t fwn = FW_T2_AH; fwn <= FW_T4_AH; fwn++) {
+    fahrwege[fwn]->setBlock(m_streckeIsRemote[1]);
+    fahrwege[fwn]->setFreeState(m_streckeIsFree[1]);
   }
 
   fahrwege[FW_WB_EFS]->setBlock(m_streckeIsRemote[2]);
+  fahrwege[FW_WB_EFS]->setFreeState(m_streckeIsFree[2]);
+  
   for (uint8_t fwn = FW_WB_T1; fwn <= FW_WB_T4; fwn++) {
     fahrwege[fwn]->setBlock(m_streckeIsRemote[2]);
+    fahrwege[fwn]->setFreeState(m_streckeIsFree[2]);
+  }
+  
+  for (uint8_t fwn = FW_T1_WB; fwn <= FW_T4_WB; fwn++) {
+    fahrwege[fwn]->setBlock(m_streckeIsRemote[2]);
+    fahrwege[fwn]->setFreeState(m_streckeIsFree[2]);
   }
 }
 
@@ -542,13 +656,13 @@ void World::setFahrstrasse(uint8_t source) {
         fahrwege[fsNum]->show(sourceTrain);
         if (sourceTrain) {
           if (fsNum <= FW_LB_T4 ) {
-            m_fromLB->done();
+            //m_fromLB->done();
             m_fromLB = fahrwege[fsNum];
           } else if (fsNum <= FW_AH_T4 ) {
-            m_fromAH->done();
+            //m_fromAH->done();
             m_fromAH = fahrwege[fsNum];
           } else if (fsNum <= FW_WB_T4 ) {
-            m_fromWB->done();
+            //m_fromWB->done();
             m_fromWB = fahrwege[fsNum];
           }
         } else {
@@ -563,19 +677,129 @@ void World::setFahrstrasse(uint8_t source) {
       }
 
       if (sourceFW) {
+        //Serial.print("Stop FW "); Serial.println((unsigned long) sourceFW);
         sourceFW->stop();
       }     
     } else {
-      if (fahrwege[fsNum]->isShown()) {
+      if (fahrwege[fsNum]->isShown() && !fahrwege[fsNum]->isRunning()) {
         Serial.print("Clear fw: "); Serial.println(fsNum);
         fahrwege[fsNum]->clear();
+        switch (fsNum) {
+          case 17: signals[7].release(); send(0xe1); break;
+          case 18: signals[8].release(); break;
+          case 19: signals[9].release(); break;
+        }
       }
     }
+
+    checkSignal(fsNum);
+  }
+}
+
+void World::checkSignal(uint8_t fsNum) {
+  unsigned long now = millis();
+  bool isActive = fahrwege[fsNum]->isShown();
+  uint8_t signalNo = 0;
+  if (fsNum == FW_LB_T4) {Serial.print(" Fahrweg active: "); Serial.print(fsNum); Serial.print(", "); Serial.print(isActive); Serial.print(", AH active: "); Serial.print(m_signalAHActive); Serial.print(", LB active: "); Serial.println(m_signalLBActive);}
+  switch (fsNum) {
+    case FW_LB_T1:
+    case FW_LB_T2:
+    case FW_LB_T3:
+    case FW_LB_T4:
+      isActive = fahrwege[FW_LB_T1]->isShown() || fahrwege[FW_LB_T2]->isShown() || fahrwege[FW_LB_T3]->isShown() || fahrwege[FW_LB_T4]->isShown();
+      setSignal(0, m_signalLBActive && isActive);
+      break;
+
+    case FW_AH_T2:
+    case FW_AH_T3:
+    case FW_AH_T4:
+      isActive = fahrwege[FW_AH_T2]->isShown() || fahrwege[FW_AH_T3]->isShown() || fahrwege[FW_AH_T4]->isShown();
+      setSignal(1, m_signalAHActive && isActive);
+      break;
+
+    case FW_T1_LB:
+      setSignal(3, m_signalLBActive && isActive);
+      break;
+
+    case FW_T2_LB:
+    case FW_T2_AH:
+      isActive = fahrwege[FW_T2_LB]->isShown() || fahrwege[FW_T2_AH]->isShown();
+      setSignal(4, (m_signalLBActive || m_signalAHActive) && isActive);
+      break;
+
+    case FW_T3_LB:
+    case FW_T3_AH:
+      isActive = fahrwege[FW_T3_LB]->isShown() || fahrwege[FW_T3_AH]->isShown();
+      setSignal(5, (m_signalLBActive || m_signalAHActive) && isActive);
+      break;
+      
+    case FW_T4_LB:
+    case FW_T4_AH:
+      isActive = fahrwege[FW_T4_LB]->isShown() || fahrwege[FW_T4_AH]->isShown();
+      setSignal(6, (m_signalLBActive || m_signalAHActive) && isActive);
+      break;
+
+    case FW_T1_WB:
+    case FW_T2_WB:
+    case FW_T4_WB:
+      if (!m_streckeIsFree[2] || !m_streckeIsRemote[2]) {
+        return;
+      }
+
+      isActive = fahrwege[FW_T1_WB]->isShown() || fahrwege[FW_T2_WB]->isShown() || fahrwege[FW_T4_WB]->isShown();
+      if (now < m_ActivateAusfahrt) {
+        //Serial.print("Wait for activation out at "); Serial.print(m_ActivateAusfahrt); Serial.print(", now is "); Serial.println(now);
+        //isActive = false;
+      } else {
+        Serial.print("fsnum "); Serial.print(fsNum); Serial.print(", isShown "); Serial.print(fahrwege[fsNum]->isShown()); Serial.print(", isActive "); Serial.println(isActive);
+        switch(fsNum) {
+          case FW_T1_WB: if (fahrwege[FW_T1_WB]->isShown()) signalNo = 7; break;
+          case FW_T2_WB: if (fahrwege[FW_T2_WB]->isShown()) signalNo = 8; break;
+          case FW_T4_WB: if (fahrwege[FW_T4_WB]->isShown()) signalNo = 9; break;
+        }
+        Serial.print("Activate out "); Serial.print(isActive); Serial.print(" - Befehl Ausfahrt "); Serial.print(m_befehlAusfahrtWB); Serial.print(", Signal "); Serial.print(signalNo); Serial.print(", free "); Serial.println(m_streckeIsFree[2]);
+        if (isActive && m_befehlAusfahrtWB) {
+          if (signalNo != 0) {
+            m_ActivateAusfahrt = UINT32_MAX;
+            Serial.print("Is active out: "); Serial.println(isActive);
+            setSignal(signalNo, isActive);
+            // Signalmelder nur bei Ausfahrt vom Gleis 1
+            send(0xe1 | ((fsNum == FW_T1_WB) ? 8 : 0));
+            }
+        } else {
+          m_ActivateAusfahrt = now + 2000ul;
+          Serial.println("Wait for activation.");
+          setSignal(signalNo, false);
+          send(0xe1);
+        }
+      }
+      break;
+
+    case FW_WB_T1:
+    case FW_WB_T2:
+    case FW_WB_T4:
+      isActive = fahrwege[FW_WB_T1]->isShown() || fahrwege[FW_WB_T2]->isShown() || fahrwege[FW_WB_T4]->isShown();
+      if (now < m_ActivateEinfahrt) {
+        //Serial.print("Wait for activation in at "); Serial.print(m_ActivateEinfahrt); Serial.print(", now is "); Serial.println(now);
+        isActive = false;
+      } else {
+        Serial.println("Activate in");
+        if (isActive) {
+          m_ActivateEinfahrt = UINT32_MAX;
+          Serial.print("Is active in: "); Serial.println(isActive);
+          setSignal(2, isActive);
+          send(0xe8); // Signalmelder M ein
+        } else {
+          setSignal(2, false);
+          send(0xe0);
+        }
+      }
+
+      break;
   }
 }
 
 void World::setSignal(int num, bool value) {
-  //Serial.print("Set signal "); Serial.print(num); Serial.print(" to "); Serial.println(value);
   if (value) {
     signals[num].set();
   } else {
@@ -589,7 +813,7 @@ void World::process(unsigned long now) {
     return;
   }
 
-  if (m_fromLB && !m_fromLB->done()) {
+ if (m_fromLB && !m_fromLB->done()) {
     m_fromLB->advance(false);
   } else {
     m_fromLB = NULL;
@@ -607,7 +831,7 @@ void World::process(unsigned long now) {
     m_fromWB = NULL;
   }
 
-  lastStep = now + 100;
+  lastStep = now + 400;
 }
 
 int activeFW = -1;
