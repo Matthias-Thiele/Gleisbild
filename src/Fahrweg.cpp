@@ -58,7 +58,7 @@ void Fahrweg::clear() {
 
   Serial.print("Is inbound? "); Serial.println(m_isInbound);
   if (m_isInbound) {
-    m_train.redraw();
+    m_trackTrains[m_track].redraw(); // m_train.redraw();
   }
 
   ledsChanged = true;
@@ -137,12 +137,20 @@ void Fahrweg::start() {
 }
 
 void Fahrweg::stop() {
-  if (m_trainRunning > 0) {
+  if (isRunning()) {
     Serial.println("stop fahrweg.");
   
     m_trainRunning = -1;
     m_train.clear();
   }
+}
+
+/**
+ * Der Zug wurde an einen erweiterten Fahrweg übertragen
+ * und läuft dort weiter.
+ **/
+void Fahrweg::clearTrain() {
+  m_trainRunning = -1;
 }
 
 void Fahrweg::setBlock(bool isRemote) {
@@ -157,7 +165,11 @@ void Fahrweg::setFreeState(bool isFree) {
 }
 
 Train* Fahrweg::getTrain() {
-  return &m_train;
+  if (m_trainRunning > 0) {
+    return &m_train;
+  } else {
+    return NULL;
+  }
 }
 
 uint8_t Fahrweg::getTrack() {
@@ -244,25 +256,29 @@ void Fahrweg::advance(bool testMode) {
         uint8_t occ = 0xf0 | sig;
         uint8_t blkf = 0xd0 | ((sig >> 4) & 0xf);
 
-        Serial.print("now at pos "); Serial.print(pos);
+        /*Serial.print("now at pos "); Serial.print(pos);
         Serial.print(", Test "); Serial.print(testMode);
         Serial.print(", Signal "); Serial.print(sig);
         Serial.print(", Remote "); Serial.print(isRemote);
         Serial.print(", Section "); Serial.print(m_sectionBlockIsRemote);
-        Serial.print(", Event "); Serial.println(ev >> 20, HEX);
+        Serial.print(", Event "); Serial.println(ev >> 20, HEX);*/
         switch (ev & 0xff00000) {
           case OCCUPANCY:
             Serial.print("Occupancy: "); Serial.println(occ, HEX);
             send(occ);
             m_train.occupancy((occ & 0xf) < 8);
+            if (!m_isInbound) {
+              Serial.print("Gleis freigeben: "); Serial.println(m_track);
+              m_trackTrains[m_track].clear();
+            }
             break;
             
           case BLOCK_FIELD:
-            Serial.print("Block field at pos "); Serial.print(pos); Serial.print(" - "); Serial.print(sig, HEX); Serial.print(", isFree: "); Serial.print(m_sectionIsFree); Serial.print(", isRemote: "); Serial.print(isRemote); Serial.print(", m_sBIR: "); Serial.println(m_sectionBlockIsRemote);
+            //Serial.print("Block field at pos "); Serial.print(pos); Serial.print(" - "); Serial.print(sig, HEX); Serial.print(", isFree: "); Serial.print(m_sectionIsFree); Serial.print(", isRemote: "); Serial.print(isRemote); Serial.print(", m_sBIR: "); Serial.println(m_sectionBlockIsRemote);
             if (ev & BLOCK_WAIT_IF_FREE) {
               if (m_sectionIsFree) {
                 // dem FDL Zeit geben den Anfangsblock zu setzen, solange nicht weiterlaufen
-                Serial.println("Wait for Anfangsfeld.");
+                //Serial.println("Wait for Anfangsfeld.");
                 return;
               }
 
@@ -311,6 +327,7 @@ void Fahrweg::advance(bool testMode) {
                 case 8:
                 case 9:
                   // alle Ausfahrten: Gleis als Frei melden.
+                  Serial.print("Gleis frei: "); Serial.println(m_track);
                   m_trackTrains[m_track].clear();
                   break;
 
@@ -322,6 +339,7 @@ void Fahrweg::advance(bool testMode) {
           case STOP_TRAIN_AH:
           case STOP_TRAIN_WB1:
           case STOP_TRAIN_WB24:
+          case STOP_TRAIN_ARRIVAL:
           case STOP_TRAIN_WBOUT:
 
             //Serial.println("Train stopped");
@@ -335,15 +353,31 @@ void Fahrweg::advance(bool testMode) {
               }
               ledsChanged = true;
             } else {
-              if (m_trainRunning > 10) {
+              if (isRunning()) {
                 Serial.print("Stop train, distance = "); Serial.println(m_trainRunning);
                 sendTrainArrived(sig);
-                m_trainRunning = -1;
-                //stop();
+                if ((m_track == 0) && m_isInbound) {
+                  checkDurchfahrt();
+                } else {
+                  if (m_isDurchfahrt) {
+                    m_trackTrains[0].clear();
+                  } else {
+                    m_trainRunning = -1;
+                    if (!m_isInbound) {
+                      Serial.println("Clear m_trackTrain.");
+                      m_trackTrains[m_track].clear();
+                    }
+                  }
+                }
               }
             }
 
-            return;
+            if ((ev & 0xffff000) == STOP_TRAIN_WBOUT) {
+              break;
+            } else {
+              m_trainRunning = -1;
+              return;
+            }
 
           case WAIT_FOR_SIGNAL:
             if (!testMode && !g_signals[sig].isSet()) {
@@ -358,7 +392,6 @@ void Fahrweg::advance(bool testMode) {
                 if (m_trackTrains[m_track].isEmpty() && !m_train.isEmpty()) {
                   Serial.print("Track allocated "); Serial.println(m_track);
                   m_trackTrains[m_track].setPositions(m_train.getPositions());
-                  //m_train.clear();
                 }
               }
               if (ev & TRACK_RELEASE) {
@@ -397,5 +430,20 @@ bool Fahrweg::done() {
 }
 
 bool Fahrweg::isRunning() {
-  return m_trainRunning > 10;
+  return m_trainRunning > 20;
+}
+
+void Fahrweg::checkDurchfahrt() {
+  Serial.println("Check Durchfahrt");
+  if (!m_isDurchfahrt) {
+    m_trainRunning = -1;
+    Serial.println("Keine Durchfahrt, stop train");
+  }
+}
+
+void Fahrweg::setDurchfahrt(bool isDurchfahrt) {
+  if (isDurchfahrt != m_isDurchfahrt) {
+    Serial.print("Set Durchfahrt: "); Serial.println(isDurchfahrt);
+  }
+  m_isDurchfahrt = isDurchfahrt;
 }

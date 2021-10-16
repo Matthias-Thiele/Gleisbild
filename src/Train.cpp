@@ -37,6 +37,7 @@ void Train::adjust(short firstPosition) {
 }
 
 void Train::advance(short toPosition) {
+  //Serial.print("Train advance to "); Serial.println(toPosition);
   short lastPos = m_positions[TRAIN_LENGTH - 1];
   if (lastPos != -1) {
     m_leds[lastPos] = m_trackColor;
@@ -63,7 +64,7 @@ void Train::setPositions(short* pos) {
 }
 
 void Train::redraw() {
-  Serial.print("Train redraw "); Serial.print((long)this, HEX);
+  Serial.print("Train redraw "); Serial.print((long)this, HEX); Serial.print(", col: "); Serial.print(m_trainColor, HEX);
   for (uint8_t i = 0; i < TRAIN_LENGTH; i++) {
     int toPosition = m_positions[i];
     Serial.print(" "); Serial.print(toPosition);

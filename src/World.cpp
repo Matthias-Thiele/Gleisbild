@@ -8,6 +8,7 @@
 extern bool ledsChanged;
 
 CRGB trainColor = {0, 0, 0xff};
+CRGB pauseColor = {0, 0xff, 0};
 CRGB trackColor = {0x20, 0x20, 0x20};
 CRGB occupiedColor = {0x40, 0x40, 0x0};
 
@@ -28,7 +29,8 @@ unsigned long lbefsev[] = {
   0
 };
 
-short lbt1[] = {315, 389, 204, 155, -1};
+//short lbt1[] = {315, 389, 204, 155, -1};
+short lbt1[] = {315, 389, 204, 130, 469, 472, -1};
 unsigned long lbt1234ev[] = {
   BLOCK_FIELD | BLOCK_LB | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
@@ -40,7 +42,7 @@ unsigned long lbt1234ev[] = {
   SET_SIGNAL | (0ul << 12) | 370ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 190ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 56ul | ONLY_TEST,
-  TRACK | TRACK_ALLOCATE | 164ul,
+  TRACK | TRACK_ALLOCATE | 165ul,
   STOP_TRAIN_LB | 164ul,
   TRACK | TRACK_ALLOCATE | 94ul,
   STOP_TRAIN_LB | 94ul,
@@ -53,9 +55,11 @@ unsigned long lbt1234ev[] = {
   0
 };
 
-short lbt2[] = {315, 389, 204, 203, 61, 55, 62, 103, -1};
+//short lbt2[] = {315, 389, 204, 203, 61, 55, 62, 103, -1};
+short lbt2[] = {315, 389, 204, 203, 61, 55, 62, 122, 125, 130, 469, 472, -1};
 short lbt3[] = {315, 389, 204, 203, 61, 48, 33, 3, -1};
-short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 450, -1};
+//short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 450, -1};
+short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 467, 119, 122, 125, 130, 469, 472, -1};
 
 // Einfahrt von Althengstett
 short ahefs[] = {280, 207, -1};
@@ -68,7 +72,8 @@ unsigned long ahefsev[] = {
   0
 };
 
-short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
+//short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
+short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 122, 125, 130, 469, 472, -1};
 unsigned long aht234ev[] = {
   BLOCK_FIELD | BLOCK_AH | 275ul,
   SET_SIGNAL | (13ul << 12) | 275ul,
@@ -90,7 +95,8 @@ unsigned long aht234ev[] = {
   0
 };
 short aht3[] = {280, 206, 391, 402, 48, 49, 33, 3, -1};
-short aht4[] = {280, 206, 391, 393, 403, 450, -1};
+//short aht4[] = {280, 206, 391, 393, 403, 450, -1};
+short aht4[] = {280, 206, 391, 393, 403, 467, 119, 122, 125, 130, 469, 472, -1};
 
 // Einfahrt von Wildberg
 short wbefs[] = {544, 558, 529, 473, -1};
@@ -103,7 +109,8 @@ unsigned long wbefsev[] = {
   0
 };
 
-short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
+//short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
+short wbt1[] = {544, 558, 529, 469, 130, 204, 389, 386, -1};
 unsigned long wbt1ev[] = {
   BLOCK_FIELD | BLOCK_WB | 548ul,
   SET_SIGNAL | (15ul << 12) | 548ul,
@@ -151,16 +158,16 @@ unsigned long cwbt1ev[] = {
   BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 165ul,
   WAIT_FOR_SIGNAL | (7ul << 12) | 165ul,
   SET_SIGNAL | (7ul << 12) | 166ul | ONLY_TEST,
-  STOP_TRAIN_WBOUT | 460ul,
   BLOCK_FIELD | BEFEHLSABGABE_UNBLOCK_H | 475,
   OCCUPANCY | OCCUP_WB_ON | 469,
   OCCUPANCY | OCCUP_WB_OFF | 473,
   RESET_SIGNAL | (7ul << 12) | 473,
   BLOCK_FIELD | BLOCK_START_SET_WB | 473ul,
+  STOP_TRAIN_WBOUT | 477ul,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
   BLOCK_FIELD | BLOCK_START_RESET_WB | 542ul,
-  STOP_TRAIN_ARRIVAL | 543,
+  STOP_TRAIN_ARRIVAL | 543ul,
   0
 };
 
@@ -169,7 +176,7 @@ unsigned long cwbt2ev[] = {
   BLOCK_FIELD | BLOCK_WB | BLOCK_IS_REMOTE | 93ul,
   WAIT_FOR_SIGNAL | (8ul << 12) | 93ul,
   SET_SIGNAL | (8ul << 12) | 91ul | ONLY_TEST,
-  STOP_TRAIN_WBOUT | 460ul,
+  STOP_TRAIN_WBOUT | 477ul,
   BLOCK_FIELD | BEFEHLSABGABE_UNBLOCK_JK | 475,
   OCCUPANCY | OCCUP_WB_ON | 469,
   OCCUPANCY | OCCUP_WB_OFF | 473,
@@ -192,6 +199,7 @@ unsigned long cwbt4ev[] = {
   OCCUPANCY | OCCUP_WB_OFF | 473,
   RESET_SIGNAL | (9ul << 12) | 473,
   BLOCK_FIELD | BLOCK_START_SET_WB | 473ul,
+  STOP_TRAIN_WBOUT | 477ul,
   SET_SIGNAL | (14ul << 12) | 500ul,
   RESET_SIGNAL | (14ul << 12) | 543ul,
   BLOCK_FIELD | BLOCK_START_RESET_WB | 542ul,
@@ -207,6 +215,8 @@ unsigned long clbt1ev[] = {
   RESET_SIGNAL | (3ul << 12) | 190ul | ONLY_TEST,
   OCCUPANCY | OCCUP_LB_ON | 389,
   OCCUPANCY | OCCUP_LB_OFF | 385,
+  //TRACK | TRACK_RELEASE | 385ul,
+  TRACK | TRACK_RELEASE | 166ul,
   BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 360,
   SET_SIGNAL | (10ul << 12) | 340ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
@@ -310,6 +320,7 @@ unsigned long caht4ev[] = {
 };
 
 World::World() {
+  m_Pause = false;
   CRGB clearColor = {0, 0, 0};
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = clearColor;
@@ -356,6 +367,9 @@ void World::initSignals() {
 
 void World::initFahrstrassen() {
   Fahrweg::setSignals(signals);
+  for (int i = 0; i < 4; i++) {
+    trackTrains[i].init(leds, trainColor, trackColor, occupiedColor);
+  }
 
   for (int i = 0; i < NUM_FAHRWEGE; i++) {
     fahrwege[i] = new Fahrweg(leds, trainColor, trackColor, occupiedColor);
@@ -495,6 +509,13 @@ void World::processCommand(uint8_t cmd) {
     case 12:
       setFahrstrasse(cmd);
       break;
+
+    case 13:
+      if ((cmd & 0xd) == 0xd) {
+        m_Pause = !m_Pause;
+        Serial.print("Pause: "); Serial.println(m_Pause);
+        leds[315] = (m_Pause) ? pauseColor : trackColor;
+      }
   }
 
   ledsChanged = true;
@@ -503,6 +524,7 @@ void World::processCommand(uint8_t cmd) {
 void World::checkStartTrain(uint8_t source) {
   uint8_t shiftedSource = source;
   uint8_t shiftedLast = m_lastStart;
+  //Serial.print("Check start train last: "); Serial.print(m_lastStart, HEX); Serial.print(", source: "); Serial.println(source);
 
   for (uint8_t i = 0; i < 3; i++) {
     if ((shiftedLast & 1) && !(shiftedSource & 1)) {
@@ -621,7 +643,8 @@ void World::changeFW(uint8_t fwNum, bool setClear) {
   if (fw->isShown() != setClear) {
     if (setClear) {
       fw->show(NULL);
-    } else {
+      checkSetDurchfahrt();
+     } else {
       Serial.print("changeFW, clear "); Serial.println(fwNum);
       fw->clear();
     }
@@ -656,14 +679,14 @@ void World::setFahrstrasse(uint8_t source) {
         fahrwege[fsNum]->show(sourceTrain);
         if (sourceTrain) {
           if (fsNum <= FW_LB_T4 ) {
-            //m_fromLB->done();
             m_fromLB = fahrwege[fsNum];
+            fahrwege[FW_LB_EFS]->clearTrain();
           } else if (fsNum <= FW_AH_T4 ) {
-            //m_fromAH->done();
             m_fromAH = fahrwege[fsNum];
+            fahrwege[FW_AH_EFS]->clearTrain();
           } else if (fsNum <= FW_WB_T4 ) {
-            //m_fromWB->done();
             m_fromWB = fahrwege[fsNum];
+            fahrwege[FW_WB_EFS]->clearTrain();
           }
         } else {
           if (fsNum >= FW_T1_LB && fsNum <= FW_T4_LB) {
@@ -692,15 +715,25 @@ void World::setFahrstrasse(uint8_t source) {
       }
     }
 
+    checkSetDurchfahrt();
     checkSignal(fsNum);
   }
+}
+
+void World::checkSetDurchfahrt() {
+    // Sonderbehandlung für Durchfahrten auf Gleis 1 (nur hier möglich).
+    bool isDurchfahrt = (fahrwege[FW_LB_T1]->isShown() && fahrwege[FW_T1_WB]->isShown()) || (fahrwege[FW_WB_T1]->isShown() && fahrwege[FW_T1_LB]->isShown());
+    fahrwege[FW_LB_T1]->setDurchfahrt(isDurchfahrt);
+    fahrwege[FW_WB_T1]->setDurchfahrt(isDurchfahrt);
+    fahrwege[FW_T1_LB]->setDurchfahrt(isDurchfahrt);
+    fahrwege[FW_T1_WB]->setDurchfahrt(isDurchfahrt);
 }
 
 void World::checkSignal(uint8_t fsNum) {
   unsigned long now = millis();
   bool isActive = fahrwege[fsNum]->isShown();
   uint8_t signalNo = 0;
-  if (fsNum == FW_LB_T4) {Serial.print(" Fahrweg active: "); Serial.print(fsNum); Serial.print(", "); Serial.print(isActive); Serial.print(", AH active: "); Serial.print(m_signalAHActive); Serial.print(", LB active: "); Serial.println(m_signalLBActive);}
+  //if (fsNum == FW_LB_T4) {Serial.print(" Fahrweg active: "); Serial.print(fsNum); Serial.print(", "); Serial.print(isActive); Serial.print(", AH active: "); Serial.print(m_signalAHActive); Serial.print(", LB active: "); Serial.println(m_signalLBActive);}
   switch (fsNum) {
     case FW_LB_T1:
     case FW_LB_T2:
@@ -751,13 +784,13 @@ void World::checkSignal(uint8_t fsNum) {
         //Serial.print("Wait for activation out at "); Serial.print(m_ActivateAusfahrt); Serial.print(", now is "); Serial.println(now);
         //isActive = false;
       } else {
-        Serial.print("fsnum "); Serial.print(fsNum); Serial.print(", isShown "); Serial.print(fahrwege[fsNum]->isShown()); Serial.print(", isActive "); Serial.println(isActive);
+        //Serial.print("fsnum "); Serial.print(fsNum); Serial.print(", isShown "); Serial.print(fahrwege[fsNum]->isShown()); Serial.print(", isActive "); Serial.println(isActive);
         switch(fsNum) {
           case FW_T1_WB: if (fahrwege[FW_T1_WB]->isShown()) signalNo = 7; break;
           case FW_T2_WB: if (fahrwege[FW_T2_WB]->isShown()) signalNo = 8; break;
           case FW_T4_WB: if (fahrwege[FW_T4_WB]->isShown()) signalNo = 9; break;
         }
-        Serial.print("Activate out "); Serial.print(isActive); Serial.print(" - Befehl Ausfahrt "); Serial.print(m_befehlAusfahrtWB); Serial.print(", Signal "); Serial.print(signalNo); Serial.print(", free "); Serial.println(m_streckeIsFree[2]);
+        //Serial.print("Activate out "); Serial.print(isActive); Serial.print(" - Befehl Ausfahrt "); Serial.print(m_befehlAusfahrtWB); Serial.print(", Signal "); Serial.print(signalNo); Serial.print(", free "); Serial.println(m_streckeIsFree[2]);
         if (isActive && m_befehlAusfahrtWB) {
           if (signalNo != 0) {
             m_ActivateAusfahrt = UINT32_MAX;
@@ -768,7 +801,7 @@ void World::checkSignal(uint8_t fsNum) {
             }
         } else {
           m_ActivateAusfahrt = now + 2000ul;
-          Serial.println("Wait for activation.");
+          //Serial.println("Wait for activation.");
           setSignal(signalNo, false);
           send(0xe1);
         }
@@ -809,7 +842,7 @@ void World::setSignal(int num, bool value) {
 
 void World::process(unsigned long now) {
   m_isTestMode = false;
-  if (now < lastStep) {
+  if ((now < lastStep) || m_Pause) {
     return;
   }
 
@@ -832,7 +865,18 @@ void World::process(unsigned long now) {
   }
 
   lastStep = now + 400;
+
+  for (int i = 0; i < 4; i++) {
+    /*if (!trackTrains[i].isEmpty()) {
+      trackTrains[i].redraw();
+    }
+    ledsChanged = true;*/
+
+    //CRGB state = (trackTrains[i].isEmpty()) ? CRGB::Green : CRGB::Red;
+    //leds[281 + i] = state;
+  }
 }
+
 
 int activeFW = -1;
 int activeSg = 0;

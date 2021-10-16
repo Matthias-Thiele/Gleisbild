@@ -21,13 +21,16 @@ class Fahrweg {
     void setFreeState(bool isFree);
     bool isShown();
     bool isRunning();
+    void setDurchfahrt(bool isDurchfahrt);
     Train* getTrain();
+    void clearTrain();
     void setTrains(Train *trackTrains);
     uint8_t getTrack();
 
   private:
     void send(uint8_t value);
     void sendTrainArrived(uint8_t source);
+    void checkDurchfahrt();
     short* m_fahrwegItems;
     unsigned long* m_eventList;
     CRGB* m_leds;
@@ -43,6 +46,7 @@ class Fahrweg {
     uint8_t m_track;
     short m_trainRunning;
     bool m_arrivalSent = false;
+    bool m_isDurchfahrt;
 };
 
 #endif

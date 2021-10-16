@@ -26,6 +26,7 @@ void DebouncedPin::init(uint8_t pin, unsigned long deltaReadMillis){
 
   for (uint8_t i = 0; i < SHIFT_COUNT; i++) {
     update();
+    delay(10);
   }
 }
 

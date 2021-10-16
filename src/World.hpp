@@ -72,6 +72,8 @@ class World {
     unsigned long m_ActivateEinfahrt = UINT32_MAX;
     unsigned long m_ActivateAusfahrt = UINT32_MAX;
     
+    bool m_Pause;
+
     void send(uint8_t value);
     void initSignals();
     void initFahrstrassen();
@@ -81,6 +83,7 @@ class World {
     void setFahrstrasse(uint8_t source);
     void changeFW(uint8_t fwNum, bool setClear);
     void checkSignal(uint8_t fsNum);
+    void checkSetDurchfahrt();
     Fahrweg* selectFW(uint8_t noSelection, uint8_t firstNum, uint8_t lastNum);
 };
 

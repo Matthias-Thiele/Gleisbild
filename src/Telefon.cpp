@@ -8,6 +8,7 @@ Telefon::Telefon(uint8_t pinLB, uint8_t pinAH, uint8_t pinWB) {
   m_pinLB.init(pinLB, 50);
   m_pinAH.init(pinAH, 50);
   m_pinWB.init(pinWB, 50);
+  m_lastOutput = 0xaa;
 }
 
 /**
@@ -27,6 +28,11 @@ uint8_t Telefon::getState() {
     result |= 4;
   }
 
+  if (result != m_lastOutput) {
+    Serial.print("Telefon: "); Serial.println(result);
+    m_lastOutput = result;
+  }
+  
   return result;
 }
 

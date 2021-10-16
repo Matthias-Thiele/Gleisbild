@@ -14,6 +14,8 @@ private:
   DebouncedPin m_pinLB;
   DebouncedPin m_pinAH;
   DebouncedPin m_pinWB;
+
+  uint8_t m_lastOutput;
   
 };
 
