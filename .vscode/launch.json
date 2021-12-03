@@ -29,6 +29,16 @@
             "projectEnvName": "megaatmega2560",
             "toolchainBinDir": "/home/matthias/.platformio/packages/toolchain-atmelavr/bin",
             "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug (without uploading)",
+            "executable": "/home/matthias/Documents/PlatformIO/Projects/Gleisbild/.pio/build/megaatmega2560/firmware.elf",
+            "projectEnvName": "megaatmega2560",
+            "toolchainBinDir": "/home/matthias/.platformio/packages/toolchain-atmelavr/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "loadMode": "manual"
         }
     ]
 }

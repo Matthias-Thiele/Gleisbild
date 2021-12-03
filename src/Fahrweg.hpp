@@ -21,6 +21,7 @@ class Fahrweg {
     void setFreeState(bool isFree);
     bool isShown();
     bool isRunning();
+    void setRunning();
     void setDurchfahrt(bool isDurchfahrt);
     Train* getTrain();
     void clearTrain();
@@ -47,6 +48,7 @@ class Fahrweg {
     short m_trainRunning;
     bool m_arrivalSent = false;
     bool m_isDurchfahrt;
+    unsigned long m_StartDelayTime;
 };
 
 #endif

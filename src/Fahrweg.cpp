@@ -3,6 +3,7 @@
 #include "Events.hpp"
 
 extern bool ledsChanged;
+extern bool drs2Available;
 Signal* g_signals;
 bool g_isTestMode;
 
@@ -34,6 +35,7 @@ Fahrweg::Fahrweg(CRGB* leds, CRGB trainColor, CRGB trackColor, CRGB occupiedColo
   m_shown = false;
   m_sectionBlockIsRemote = false;
   m_trainRunning = -1;
+  m_StartDelayTime = 0;
 }
 
 void Fahrweg::clear() {
@@ -56,8 +58,8 @@ void Fahrweg::clear() {
     }
   }
 
-  Serial.print("Is inbound? "); Serial.println(m_isInbound);
-  if (m_isInbound) {
+  Serial.print("Is inbound? "); Serial.print(m_isInbound);Serial.print(", track: ");Serial.println(m_track);
+  if (m_isInbound && (m_track < 5)) {
     m_trackTrains[m_track].redraw(); // m_train.redraw();
   }
 
@@ -274,7 +276,7 @@ void Fahrweg::advance(bool testMode) {
             break;
             
           case BLOCK_FIELD:
-            //Serial.print("Block field at pos "); Serial.print(pos); Serial.print(" - "); Serial.print(sig, HEX); Serial.print(", isFree: "); Serial.print(m_sectionIsFree); Serial.print(", isRemote: "); Serial.print(isRemote); Serial.print(", m_sBIR: "); Serial.println(m_sectionBlockIsRemote);
+            Serial.print("Block field at pos "); Serial.print(pos); Serial.print(" - "); Serial.print(sig, HEX); Serial.print(", isFree: "); Serial.print(m_sectionIsFree); Serial.print(", isRemote: "); Serial.print(isRemote); Serial.print(", m_sBIR: "); Serial.println(m_sectionBlockIsRemote);
             if (ev & BLOCK_WAIT_IF_FREE) {
               if (m_sectionIsFree) {
                 // dem FDL Zeit geben den Anfangsblock zu setzen, solange nicht weiterlaufen
@@ -292,45 +294,51 @@ void Fahrweg::advance(bool testMode) {
               }
             } else {
               Serial.print("Change block field "); Serial.println(blkf, HEX);
-              send(blkf);
+              if (!drs2Available || ((blkf != 0xd2) && (blkf != 0xd3))) {
+                send(blkf);
+              }
             }
             break;
 
           case SET_SIGNAL:
             if (!onlyTest || testMode) {
-              g_signals[sig].set();
-              Serial.print(" Set signal "); Serial.print(sig); Serial.print(" at pos "); Serial.println(pos);
-              if (sig == 2) {
-                send(0xe8); // Signalmelder M ein
+              if (!drs2Available || ((sig != 10) && (sig != 11))) {
+                g_signals[sig].set();
+                Serial.print(" Set signal "); Serial.print(sig); Serial.print(" at pos "); Serial.println(pos);
+                if (sig == 2) {
+                  send(0xe8); // Signalmelder M ein
+                }
               }
             }
             break;
         
           case RESET_SIGNAL:
             if (!onlyTest || testMode) {
-              g_signals[sig].release();
-              Serial.print(" Reset signal "); Serial.print(sig); Serial.print(" at pos "); Serial.println(pos);
-              switch (sig) {
-                case 2:
-                  send(0xe0); // Signalmelder M aus
-                  break;
+              if (!drs2Available || ((sig != 10) && (sig != 11))) {
+                g_signals[sig].release();
+                Serial.print(" Reset signal "); Serial.print(sig); Serial.print(" at pos "); Serial.println(pos);
+                switch (sig) {
+                  case 2:
+                    send(0xe0); // Signalmelder M aus
+                    break;
 
-                case 7:
-                  send(0xe1); // Signalmelder H aus
-                  m_trackTrains[m_track].clear();
-                  break;
+                  case 7:
+                    send(0xe1); // Signalmelder H aus
+                    m_trackTrains[m_track].clear();
+                    break;
 
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 8:
-                case 9:
-                  // alle Ausfahrten: Gleis als Frei melden.
-                  Serial.print("Gleis frei: "); Serial.println(m_track);
-                  m_trackTrains[m_track].clear();
-                  break;
+                  case 3:
+                  case 4:
+                  case 5:
+                  case 6:
+                  case 8:
+                  case 9:
+                    // alle Ausfahrten: Gleis als Frei melden.
+                    Serial.print("Gleis frei: "); Serial.println(m_track);
+                    m_trackTrains[m_track].clear();
+                    break;
 
+                }
               }
             }
             break;
@@ -380,9 +388,26 @@ void Fahrweg::advance(bool testMode) {
             }
 
           case WAIT_FOR_SIGNAL:
+            Serial.print("Signal wait "); Serial.println(g_signals[sig].isSet());
             if (!testMode && !g_signals[sig].isSet()) {
               //Serial.print(" Wait for signal "); Serial.println(sig);
+              m_StartDelayTime = 1;
               return;
+            }
+
+            Serial.print("Start delay is "); Serial.println(m_StartDelayTime);
+            if (m_StartDelayTime == 1) {
+              m_StartDelayTime = millis() + 5000;
+              Serial.print("Start delay at "); Serial.println(m_StartDelayTime);
+              return;
+            } else {
+              if (m_StartDelayTime > millis()) {
+                Serial.println("Abort while wait.");
+                return;
+              }
+
+              Serial.println("Signal wait done.");
+              m_StartDelayTime = 0;
             }
             break;
 
@@ -431,6 +456,10 @@ bool Fahrweg::done() {
 
 bool Fahrweg::isRunning() {
   return m_trainRunning > 20;
+}
+
+void Fahrweg::setRunning() {
+  m_trainRunning = 21;
 }
 
 void Fahrweg::checkDurchfahrt() {

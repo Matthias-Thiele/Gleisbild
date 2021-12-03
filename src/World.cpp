@@ -1,11 +1,13 @@
 #include "World.hpp"
 #include "Events.hpp"
+#include "DRS2.h"
 
 #define BRIGHTNESS  255
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 
 extern bool ledsChanged;
+extern bool drs2Available;
 
 CRGB trainColor = {0, 0, 0xff};
 CRGB pauseColor = {0, 0xff, 0};
@@ -23,6 +25,7 @@ short lbefs[] = {315, 385, -1};
 unsigned long lbefsev[] = {
   BLOCK_FIELD | BLOCK_LB | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
+  WAIT_FOR_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
   BLOCK_FIELD | BLOCK_END_SET_LB | 336ul,
   WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
@@ -34,6 +37,7 @@ short lbt1[] = {315, 389, 204, 130, 469, 472, -1};
 unsigned long lbt1234ev[] = {
   BLOCK_FIELD | BLOCK_LB | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
+  WAIT_FOR_SIGNAL | (11ul << 12) | 320ul,
   RESET_SIGNAL | (11ul << 12) | 335ul,
   BLOCK_FIELD | BLOCK_END_SET_LB | 336ul,
   WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
@@ -447,6 +451,52 @@ void World::initFahrstrassen() {
 
  }
 
+void World::processDrs2Command(unsigned long now, uint8_t cmd) {
+  Serial.print("DRS2 command "); Serial.println(cmd);
+  
+  switch (cmd) {
+    case DRS2_IS_ALIVE:
+      Serial3.write(DRS2HB);
+      drs2Available = true;
+      m_DecativateDrs2 = now + 10000;
+      break;
+
+    case DRS2_ANF_ENTBLOCKEN:
+      Serial1.write(0xd2);
+      break;
+
+    case DRS2_ERL_ENTBLOCKEN:
+      Serial1.write(0xd1);
+      break;
+
+    case DRS2_END_ENTBLOCKEN:
+      Serial1.write(0xd3);
+      break;
+
+    case DRS2_SIGA_FAHRT:
+    case DRS2_ERSATZA:
+      signals[SIG_EINF_LB].set();
+      break;
+
+    case DRS2_SIGA_HALT:
+      signals[SIG_EINF_LB].release();
+      break;
+
+    case DRS2_SIGBCD_FAHRT:
+    case DRS2_ERSATZBCD:
+      signals[SIG_AUSF_LB].set();
+      break;
+
+    case DRS2_SIGBCD_HALT:
+      signals[SIG_AUSF_LB].release();
+      break;
+
+    case DRS2_AUSFAHRT_GESETZT:
+      startTrain(0);
+      break;
+  }
+}
+
 void World::processCommand(uint8_t cmd) {
   if (m_isTestMode) {
     return;
@@ -539,11 +589,35 @@ void World::checkStartTrain(uint8_t source) {
 }
 
 /**
+ * Streckenblock-Info an DRS2 durchgeben
+ **/
+void World::updateDrs2(uint8_t source) {
+  bool isErlaubnis = (source & 8) == 0;
+  uint8_t val;
+
+  if (isErlaubnis) {
+    m_DRS_IS_FROM_LB = (source & 1);
+     val =  (m_DRS_IS_FROM_LB) ? DRS2_LB_UNBLOCKED: DRS2_LB_BLOCKED;
+  } else {
+    bool isFree = source & 1;
+    if (m_DRS_IS_FROM_LB) {
+      val = (isFree) ? DRS2_LB_END_BLOCKED : DRS2_LB_END_UNBLOCKED;
+    } else {
+      val = (isFree) ? DRS2_LB_ANF_BLOCKED : DRS2_LB_ANF_UNBLOCKED;
+    }
+  }
+
+  Serial3.write(val);
+  //Serial.print("Send DRS2: "); Serial.println(val);
+}
+
+/**
  * Section block, lower nibble: <Erl 0/Free 1> <Wildberg> <Althengstett> <Liebenzell>
  * 1: is remote, 0: is local
  **/
 void World::updateStreckenblock(uint8_t source) {
   //Serial.print("Update Streckenblock "); Serial.println(source, HEX);
+  updateDrs2(source);
   bool isErlaubnis = (source & 8) == 0;
 
   for (uint8_t i = 0; i < 3; i++) {
@@ -638,11 +712,16 @@ Fahrweg* World::selectFW(uint8_t noSelection, uint8_t firstNum, uint8_t lastNum)
   return result;
 }
 
-void World::changeFW(uint8_t fwNum, bool setClear) {
+void World::changeFW(uint8_t fwNum, bool setClear, Train* sourceTrain) {
   Fahrweg *fw = fahrwege[fwNum];
   if (fw->isShown() != setClear) {
     if (setClear) {
-      fw->show(NULL);
+      fw->show(sourceTrain);
+      if (sourceTrain != NULL) {
+        Serial.println("Redraw souce train.");
+        sourceTrain->redraw();
+      }
+
       checkSetDurchfahrt();
      } else {
       Serial.print("changeFW, clear "); Serial.println(fwNum);
@@ -663,15 +742,15 @@ void World::setFahrstrasse(uint8_t source) {
       if (fsNum <= FW_LB_T4 ) {
         sourceTrain = fahrwege[FW_LB_EFS]->getTrain();
         sourceFW = fahrwege[FW_LB_EFS];
-        changeFW(FW_LB_EFS, false);
+        changeFW(FW_LB_EFS, false, sourceTrain);
       } else if (fsNum <= FW_AH_T4 ) {
         sourceTrain = fahrwege[FW_AH_EFS]->getTrain();
         sourceFW = fahrwege[FW_AH_EFS];
-        changeFW(FW_AH_EFS, false);
+        changeFW(FW_AH_EFS, false, sourceTrain);
       } else if (fsNum <= FW_WB_T4 ) {
         sourceTrain = fahrwege[FW_WB_EFS]->getTrain();
         sourceFW = fahrwege[FW_WB_EFS];
-        changeFW(FW_WB_EFS, false);
+        changeFW(FW_WB_EFS, false, sourceTrain);
       }
 
       if (!fahrwege[fsNum]->isShown()) {
@@ -704,14 +783,44 @@ void World::setFahrstrasse(uint8_t source) {
         sourceFW->stop();
       }     
     } else {
+      sourceTrain = fahrwege[fsNum]->getTrain();
+
       if (fahrwege[fsNum]->isShown() && !fahrwege[fsNum]->isRunning()) {
         Serial.print("Clear fw: "); Serial.println(fsNum);
+
         fahrwege[fsNum]->clear();
         switch (fsNum) {
-          case 17: signals[7].release(); send(0xe1); break;
-          case 18: signals[8].release(); break;
-          case 19: signals[9].release(); break;
+          case FW_T1_WB: signals[7].release(); send(0xe1); break;
+          case FW_T2_WB: signals[8].release(); break;
+          case FW_T4_WB: signals[9].release(); break;
+
         }
+      }
+
+      switch (fsNum) {
+          // Zug an Einfahrts-Fahrweg zurückgeben
+          case FW_LB_T1:
+          case FW_LB_T2:
+          case FW_LB_T3:
+          case FW_LB_T4:
+            if ((sourceTrain != NULL) && !sourceTrain->isEmpty() && !fahrwege[FW_LB_EFS]->isShown() && (!fahrwege[fsNum]->isRunning())) {
+              Serial.print("Return FW LB "); Serial.println((sourceTrain == NULL) ? "kein Zug" : (sourceTrain->isEmpty() ? "leer" : "laufender Zug"));
+              fahrwege[FW_LB_EFS]->show(sourceTrain);
+              fahrwege[FW_LB_EFS]->setRunning();
+              sourceTrain->redraw();
+            }
+            break;
+
+          case FW_AH_T2:
+          case FW_AH_T3:
+          case FW_AH_T4:
+            if ((sourceTrain != NULL) && !sourceTrain->isEmpty() && !fahrwege[FW_AH_EFS]->isShown() && (!fahrwege[fsNum]->isRunning())) {
+              Serial.print("Return FW AH "); Serial.println((sourceTrain == NULL) ? "kein Zug" : (sourceTrain->isEmpty() ? "leer" : "laufender Zug"));
+              fahrwege[FW_AH_EFS]->show(sourceTrain);
+              fahrwege[FW_AH_EFS]->setRunning();
+              sourceTrain->redraw();
+            }
+            break;
       }
     }
 
@@ -846,6 +955,11 @@ void World::process(unsigned long now) {
     return;
   }
 
+  if (now > m_DecativateDrs2) {
+    //Serial.println("Deactivate drs2");
+    drs2Available = false;
+  }
+
  if (m_fromLB && !m_fromLB->done()) {
     m_fromLB->advance(false);
   } else {
@@ -864,7 +978,7 @@ void World::process(unsigned long now) {
     m_fromWB = NULL;
   }
 
-  lastStep = now + 400;
+  lastStep = now + 600;
 
   for (int i = 0; i < 4; i++) {
     /*if (!trackTrains[i].isEmpty()) {

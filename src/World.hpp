@@ -15,6 +15,9 @@
 #define NUM_FAHRWEGE 23
 #define LED_PIN     5
 
+#define SIG_EINF_LB 10
+#define SIG_AUSF_LB 11
+
 #define FW_LB_EFS 20
 #define FW_LB_T1 0
 #define FW_LB_T2 1
@@ -48,6 +51,7 @@ class World {
     void process(unsigned long now);
     void setSignal(int num, bool value);
     void processCommand(uint8_t cmd);
+    void processDrs2Command(unsigned long now, uint8_t cmd);
 
   private:
     CRGB leds[NUM_LEDS];
@@ -71,9 +75,12 @@ class World {
     bool m_befehlEinfahrtWB = false;
     unsigned long m_ActivateEinfahrt = UINT32_MAX;
     unsigned long m_ActivateAusfahrt = UINT32_MAX;
-    
+    unsigned long m_DecativateDrs2 = 0;
+
     bool m_Pause;
 
+    bool m_DRS_IS_FROM_LB;
+    
     void send(uint8_t value);
     void initSignals();
     void initFahrstrassen();
@@ -81,9 +88,10 @@ class World {
     void startTrain(uint8_t source);
     void updateStreckenblock(uint8_t source);
     void setFahrstrasse(uint8_t source);
-    void changeFW(uint8_t fwNum, bool setClear);
+    void changeFW(uint8_t fwNum, bool setClear, Train* sourceTrai);
     void checkSignal(uint8_t fsNum);
     void checkSetDurchfahrt();
+    void updateDrs2(uint8_t source);
     Fahrweg* selectFW(uint8_t noSelection, uint8_t firstNum, uint8_t lastNum);
 };
 
