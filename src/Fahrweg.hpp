@@ -32,6 +32,8 @@ class Fahrweg {
     void send(uint8_t value);
     void sendTrainArrived(uint8_t source);
     void checkDurchfahrt();
+    void processDrsTrack(uint8_t part);
+    void sendDrs2(uint8_t cmd1, uint8_t cmd2);
     short* m_fahrwegItems;
     unsigned long* m_eventList;
     CRGB* m_leds;

@@ -51,4 +51,23 @@
 #define OCCUP_WB_OFF 0xb000ul
 #define OCCUP_T3_OFF 0x8000ul
 
+// DRS2
+#define FIELD_ENTER 0x8000000ul
+#define ENTER_LB_EINF_SIG_1 0x1u
+#define ENTER_LB_EINF_SIG_2 0x2u
+#define ENTER_LB_EINF_SIG_3 0x3u
+#define ENTER_LB_EINF_WEICHE_1 0x4u
+#define ENTER_LB_EINF_WEICHE_2 0x5u
+#define ENTER_LB_EINF_GLEIS_123 0x6u
+
+#define EXIT_LB_AUSF_GLEIS_123 0x8u
+#define EXIT_LB_AUSF_WEICHE_2 0x9u
+#define EXIT_LB_AUSF_WEICHE_1 0xau
+#define EXIT_LB_AUSF_SIG_3 0xbu
+#define EXIT_LB_AUSF_SIG_2 0xcu
+#define EXIT_LB_AUSF_SIG_1 0xdu
+
+#define STRECKE_LB_CALW 0xfu
+
+
 #define ONLY_TEST 0x10000000ul

@@ -23,6 +23,7 @@ int testList[] = {FW_AH_T3, FW_WB_T2, FW_LB_T4, FW_T3_LB, FW_T2_AH, FW_LB_T1, FW
 // Einfahrt von Bad Liebenzell
 short lbefs[] = {315, 385, -1};
 unsigned long lbefsev[] = {
+  FIELD_ENTER | (EXIT_LB_AUSF_GLEIS_123 << 12) | 315,
   BLOCK_FIELD | BLOCK_LB | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
   WAIT_FOR_SIGNAL | (11ul << 12) | 320ul,
@@ -35,14 +36,21 @@ unsigned long lbefsev[] = {
 //short lbt1[] = {315, 389, 204, 155, -1};
 short lbt1[] = {315, 389, 204, 130, 469, 472, -1};
 unsigned long lbt1234ev[] = {
+  FIELD_ENTER | (EXIT_LB_AUSF_GLEIS_123 << 12) | 315,
   BLOCK_FIELD | BLOCK_LB | 319ul,
   SET_SIGNAL | (11ul << 12) | 320ul,
   WAIT_FOR_SIGNAL | (11ul << 12) | 320ul,
+  FIELD_ENTER | (EXIT_LB_AUSF_WEICHE_2 << 12) | 321,
+  FIELD_ENTER | (EXIT_LB_AUSF_WEICHE_1 << 12) | 327,
+  FIELD_ENTER | (EXIT_LB_AUSF_SIG_3 << 12) | 335,
   RESET_SIGNAL | (11ul << 12) | 335ul,
   BLOCK_FIELD | BLOCK_END_SET_LB | 336ul,
+  FIELD_ENTER | (EXIT_LB_AUSF_SIG_2 << 12) | 350,
+  FIELD_ENTER | (EXIT_LB_AUSF_SIG_1 << 12) | 365,
   WAIT_FOR_SIGNAL | (0ul << 12) | 383ul,
   OCCUPANCY | OCCUP_LB_ON | 385,
   OCCUPANCY | OCCUP_LB_OFF | 389,
+  FIELD_ENTER | (STRECKE_LB_CALW << 12) | 389,
   SET_SIGNAL | (0ul << 12) | 370ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 190ul | ONLY_TEST,
   RESET_SIGNAL | (0ul << 12) | 56ul | ONLY_TEST,
@@ -59,10 +67,8 @@ unsigned long lbt1234ev[] = {
   0
 };
 
-//short lbt2[] = {315, 389, 204, 203, 61, 55, 62, 103, -1};
 short lbt2[] = {315, 389, 204, 203, 61, 55, 62, 122, 125, 130, 469, 472, -1};
 short lbt3[] = {315, 389, 204, 203, 61, 48, 33, 3, -1};
-//short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 450, -1};
 short lbt4[] = {315, 389, 204, 203, 61, 43, 419, 467, 119, 122, 125, 130, 469, 472, -1};
 
 // Einfahrt von Althengstett
@@ -76,7 +82,6 @@ unsigned long ahefsev[] = {
   0
 };
 
-//short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 103, -1};
 short aht2[] = {280, 206, 391, 402, 48, 49, 33, 33, 42, 38, 73, 122, 125, 130, 469, 472, -1};
 unsigned long aht234ev[] = {
   BLOCK_FIELD | BLOCK_AH | 275ul,
@@ -99,7 +104,6 @@ unsigned long aht234ev[] = {
   0
 };
 short aht3[] = {280, 206, 391, 402, 48, 49, 33, 3, -1};
-//short aht4[] = {280, 206, 391, 393, 403, 450, -1};
 short aht4[] = {280, 206, 391, 393, 403, 467, 119, 122, 125, 130, 469, 472, -1};
 
 // Einfahrt von Wildberg
@@ -113,7 +117,6 @@ unsigned long wbefsev[] = {
   0
 };
 
-//short wbt1[] = {544, 558, 529, 469, 130, 180, -1};
 short wbt1[] = {544, 558, 529, 469, 130, 204, 389, 386, -1};
 unsigned long wbt1ev[] = {
   BLOCK_FIELD | BLOCK_WB | 548ul,
@@ -219,8 +222,13 @@ unsigned long clbt1ev[] = {
   RESET_SIGNAL | (3ul << 12) | 190ul | ONLY_TEST,
   OCCUPANCY | OCCUP_LB_ON | 389,
   OCCUPANCY | OCCUP_LB_OFF | 385,
-  //TRACK | TRACK_RELEASE | 385ul,
   TRACK | TRACK_RELEASE | 166ul,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_1 << 12) | 389,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_2 << 12) | 365,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_3 << 12) | 350,
+  FIELD_ENTER | (ENTER_LB_EINF_WEICHE_1 << 12) | 335,
+  FIELD_ENTER | (ENTER_LB_EINF_WEICHE_2 << 12) | 305,
+  FIELD_ENTER | (ENTER_LB_EINF_GLEIS_123 << 12) | 313,
   BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 360,
   SET_SIGNAL | (10ul << 12) | 340ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
@@ -236,6 +244,12 @@ unsigned long clbt2ev[] = {
   RESET_SIGNAL | (4ul << 12) | 60ul | ONLY_TEST,
   OCCUPANCY | OCCUP_LB_ON | 389,
   OCCUPANCY | OCCUP_LB_OFF | 385,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_1 << 12) | 389,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_2 << 12) | 365,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_3 << 12) | 350,
+  FIELD_ENTER | (ENTER_LB_EINF_WEICHE_1 << 12) | 335,
+  FIELD_ENTER | (ENTER_LB_EINF_WEICHE_2 << 12) | 305,
+  FIELD_ENTER | (ENTER_LB_EINF_GLEIS_123 << 12) | 313,
   BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 360,
   SET_SIGNAL | (10ul << 12) | 340ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,
@@ -266,6 +280,12 @@ unsigned long clbt4ev[] = {
   RESET_SIGNAL | (6ul << 12) | 420ul | ONLY_TEST,
   OCCUPANCY | OCCUP_LB_ON | 389,
   OCCUPANCY | OCCUP_LB_OFF | 385,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_1 << 12) | 389,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_2 << 12) | 365,
+  FIELD_ENTER | (ENTER_LB_EINF_SIG_3 << 12) | 350,
+  FIELD_ENTER | (ENTER_LB_EINF_WEICHE_1 << 12) | 335,
+  FIELD_ENTER | (ENTER_LB_EINF_WEICHE_2 << 12) | 305,
+  FIELD_ENTER | (ENTER_LB_EINF_GLEIS_123 << 12) | 313,
   BLOCK_FIELD | BLOCK_WAIT_IF_FREE | 360,
   SET_SIGNAL | (10ul << 12) | 340ul,
   RESET_SIGNAL | (10ul << 12) | 314ul,

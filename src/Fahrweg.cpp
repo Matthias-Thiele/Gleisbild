@@ -1,6 +1,7 @@
 #include "Fahrweg.hpp"
 #include "Signal.hpp"
 #include "Events.hpp"
+#include "DRS2.h"
 
 extern bool ledsChanged;
 extern bool drs2Available;
@@ -222,6 +223,73 @@ void Fahrweg::sendTrainArrived(uint8_t source) {
   }
 }
 
+void Fahrweg::sendDrs2(uint8_t cmd1, uint8_t cmd2) {
+  if (cmd1) {
+    Serial3.write(cmd1);
+    Serial.print("To drs2: "); Serial.println(cmd1);
+  }
+  if (cmd2) {
+    Serial3.write(cmd2);
+    Serial.print("To drs2: "); Serial.println(cmd2);
+  }
+}
+
+void Fahrweg::processDrsTrack(uint8_t part) {
+  switch (part) {
+    case EXIT_LB_AUSF_GLEIS_123:
+      sendDrs2(0, DRS2_GL123_BES);
+      break;
+
+    case EXIT_LB_AUSF_WEICHE_2:
+      sendDrs2(0, DRS2_WEICHE23_BES);
+      break;
+
+    case EXIT_LB_AUSF_WEICHE_1:
+      sendDrs2(DRS2_WEICHE23_FREI, DRS2_WEICHE1_BES);
+      break;
+
+    case EXIT_LB_AUSF_SIG_3:
+      sendDrs2(DRS2_WEICHE1_FREI, DRS2_ABSCHNITT3_BES);
+      break;
+
+    case EXIT_LB_AUSF_SIG_2:
+      sendDrs2(DRS2_ABSCHNITT3_FREI, DRS2_ABSCHNITT2_BES);
+      break;
+
+    case EXIT_LB_AUSF_SIG_1:
+      sendDrs2(DRS2_ABSCHNITT2_FREI, DRS2_ABSCHNITT1_BES);
+      break;
+
+    case STRECKE_LB_CALW:
+      sendDrs2(DRS2_ABSCHNITT1_FREI, 0);
+      break;
+
+    case ENTER_LB_EINF_SIG_1:
+      sendDrs2(0, DRS2_ABSCHNITT1_BES);
+      break;
+
+    case ENTER_LB_EINF_SIG_2:
+      sendDrs2(DRS2_ABSCHNITT1_FREI, DRS2_ABSCHNITT2_BES);
+      break;
+
+    case ENTER_LB_EINF_SIG_3:
+      sendDrs2(DRS2_ABSCHNITT2_FREI, DRS2_ABSCHNITT3_BES);
+      break;
+
+    case ENTER_LB_EINF_WEICHE_1:
+      sendDrs2(DRS2_ABSCHNITT3_FREI, DRS2_WEICHE1_BES);
+      break;
+
+    case ENTER_LB_EINF_WEICHE_2:
+      sendDrs2(DRS2_WEICHE1_FREI, DRS2_WEICHE23_BES);
+      break;
+
+    case ENTER_LB_EINF_GLEIS_123:
+      sendDrs2(DRS2_WEICHE23_FREI, DRS2_GL123_BES);
+      break;
+  }
+}
+
 void Fahrweg::advance(bool testMode) {
   /*Serial.print("Advance pos: "); Serial.print(m_fwi.peekPos()); 
   Serial.print(", test: "); Serial.print(testMode); 
@@ -265,6 +333,10 @@ void Fahrweg::advance(bool testMode) {
         Serial.print(", Section "); Serial.print(m_sectionBlockIsRemote);
         Serial.print(", Event "); Serial.println(ev >> 20, HEX);*/
         switch (ev & 0xff00000) {
+          case FIELD_ENTER:
+            processDrsTrack(sig);
+            break;
+
           case OCCUPANCY:
             Serial.print("Occupancy: "); Serial.println(occ, HEX);
             send(occ);
