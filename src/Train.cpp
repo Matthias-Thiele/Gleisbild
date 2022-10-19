@@ -54,13 +54,17 @@ void Train::advance(short toPosition) {
 }
 
 short* Train::getPositions() {
+  Serial.print("getPositions "); for (uint8_t i = 0; i < TRAIN_LENGTH; i++) {Serial.print(m_positions[i]); Serial.print(" - ");} Serial.println();
   return m_positions;
 }
 
 void Train::setPositions(short* pos) {
+  Serial.print("setPositions "); Serial.print(*pos); Serial.print(" ");
   for (uint8_t i = 0; i < TRAIN_LENGTH; i++) {
     m_positions[i] = *pos++;
+    Serial.print(m_positions[i]);
   }
+  Serial.println();
 }
 
 void Train::redraw() {

@@ -55,6 +55,7 @@ class World {
 
   private:
     CRGB leds[NUM_LEDS];
+    CRGB m_pauseBuffer;
     Signal signals[NUM_SIGNALS];
     Train trackTrains[4];
     Fahrweg *fahrwege[NUM_FAHRWEGE];

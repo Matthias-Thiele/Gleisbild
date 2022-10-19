@@ -348,7 +348,7 @@ void Fahrweg::advance(bool testMode) {
             break;
             
           case BLOCK_FIELD:
-            Serial.print("Block field at pos "); Serial.print(pos); Serial.print(" - "); Serial.print(sig, HEX); Serial.print(", isFree: "); Serial.print(m_sectionIsFree); Serial.print(", isRemote: "); Serial.print(isRemote); Serial.print(", m_sBIR: "); Serial.println(m_sectionBlockIsRemote);
+            //Serial.print("Block field at pos "); Serial.print(pos); Serial.print(" - "); Serial.print(sig, HEX); Serial.print(", isFree: "); Serial.print(m_sectionIsFree); Serial.print(", isRemote: "); Serial.print(isRemote); Serial.print(", m_sBIR: "); Serial.println(m_sectionBlockIsRemote);
             if (ev & BLOCK_WAIT_IF_FREE) {
               if (m_sectionIsFree) {
                 // dem FDL Zeit geben den Anfangsblock zu setzen, solange nicht weiterlaufen
@@ -361,7 +361,7 @@ void Fahrweg::advance(bool testMode) {
             
             if (sig < 0x10) {
               if (!testMode && ((m_sectionBlockIsRemote != isRemote) || !m_sectionIsFree)) {
-                Serial.println("Wait for section block.");
+                //Serial.println("Wait for section block.");
                 return;
               }
             } else {

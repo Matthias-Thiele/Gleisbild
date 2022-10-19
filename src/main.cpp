@@ -47,7 +47,7 @@ void loop() {
   if (Serial3.available()) {
     uint8_t val = Serial3.read();
     //if (val != 0) {
-      Serial.print(" "); Serial.print(val);
+      //Serial.print(" "); Serial.print(val);
       if (val == 80) {
         Serial.println();
       }
